@@ -19,7 +19,7 @@ export const COMPETITION_NAMES = [
 
 export async function postWeeklyOverviews(client) {
     const servers = await getAllServerConfig();
-    const uniqueCompetitions = new Set(servers.flatMap(s => s.competitions || []));
+    const uniqueCompetitions = new Set(servers.flatMap(s => s.competitionId || []));
     if (uniqueCompetitions.size === 0) return;
     const { dateFrom, dateTo } = getDateRange();
     const dateRange = `${dateFrom}_${dateTo}`;
@@ -63,7 +63,7 @@ export async function postWeeklyOverviews(client) {
 // This function runs every 15 minutes to update scores
 export async function updateAllScores(client) {
     const servers = await getAllServerConfig();
-    const uniqueCompetitions = new Set(servers.flatMap(s => s.competitions || []));
+    const uniqueCompetitions = new Set(servers.flatMap(s => s.competitionId || []));
 
     if (uniqueCompetitions.size === 0) {
         console.log("[Update] No competitions to update.");
