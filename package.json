@@ -1,0 +1,20 @@
+{
+  "name": "football-match-info-botdiscord",
+  "version": "0.0.1",
+  "description": "Add information match in channel discord and update scores",
+  "main": "./src/main.js",
+  "scripts": {
+    "start": "node .",
+    "test": "echo \"Error: no test spécified\" && exit 1"
+  },
+  "type": "module",
+  "author": "Alexandre Messuve",
+  "dependencies": {
+    "axios": "^1.11.0",
+    "date-fns": "^4.1.0",
+    "discord.js": "^14.21.0",
+    "dotenv": "^17.2.1",
+    "mongodb": "^6.18.0",
+    "node-cron": "^4.2.1"
+  }
+}
