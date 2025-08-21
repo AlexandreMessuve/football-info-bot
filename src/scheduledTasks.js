@@ -73,7 +73,7 @@ export async function updateAllScores(client) {
     const { dateFrom, dateTo } = getDateRange();
     const dateRange = `${dateFrom}_${dateTo}`;
 
-    const allMatches = await getMatchesForInterval([...uniqueCompetitions], format(monday, 'yyyy-MM-dd'), format(sunday, 'yyyy-MM-dd'));
+    const allMatches = await getMatchesForInterval([...uniqueCompetitions], dateFrom, dateTo);
     const matchesByCompetition = allMatches.reduce((acc, match) => {
         const id = match.competition.id;
         if (!acc[id]) acc[id] = [];
