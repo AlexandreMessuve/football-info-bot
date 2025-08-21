@@ -4,9 +4,7 @@ import 'dotenv/config';
 import {addCompetition, removeCompetition, setServerChannel} from "./serverConfig.js";
 import {deleteCompetitionMessage, postCompetitionMessage} from "./match.js";
 import * as cron from "node-cron";
-import {postWeeklyOverviews, updateAllScores} from "./scheduledTasks.js"; // Pour charger les variables d'environnement
-
-console.log(process.env);
+import {postWeeklyOverviews, updateAllScores} from "./scheduledTasks.js";
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.once(Events.ClientReady, async c => {
