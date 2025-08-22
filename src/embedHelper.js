@@ -6,7 +6,7 @@
 export function createMatchField(match) {
     const homeTeam = match.homeTeam.name;
     const awayTeam = match.awayTeam.name;
-    const matchTime = '<t:' + new Date(match.utcDate).getTime() + ':R>';
+    const matchTime = '<t:' + Math.floor(new Date(match.utcDate).getTime() / 1000) + ':R>';
 
     let name = `⚽ ${homeTeam} vs ${awayTeam}`;
     let value;
