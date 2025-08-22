@@ -24,7 +24,7 @@ export async function postWeeklyOverviews(client) {
     const { dateFrom, dateTo } = getDateRange();
     const dateRange = `${dateFrom}_${dateTo}`;
 
-    const allMatches = await getDailyMatche(uniqueCompetitions.join(','), dateFrom, dateTo);
+    const allMatches = await getDailyMatche([...uniqueCompetitions].join(','), dateFrom, dateTo);
     const matchesByCompetition = allMatches.reduce((acc, match) => {
         const id = match.competition.id;
         if (!acc[id]) {
@@ -73,7 +73,7 @@ export async function updateAllScores(client) {
     const { dateFrom, dateTo } = getDateRange();
     const dateRange = `${dateFrom}_${dateTo}`;
 
-    const allMatches = await getDailyMatches(uniqueCompetitions.join(','), dateFrom, dateTo);
+    const allMatches = await getDailyMatches([...uniqueCompetitions].join(','), dateFrom, dateTo);
     const matchesByCompetition = allMatches.reduce((acc, match) => {
         const id = match.competition.id;
         if (!acc[id]) acc[id] = [];
