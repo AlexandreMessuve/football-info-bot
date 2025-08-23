@@ -52,7 +52,7 @@ export async function postWeeklyOverviews(client) {
                     let embed = new EmbedBuilder()
                         .setColor('#0099ff')
                         .setTitle(`📅 Programme - ${competitionName}`)
-                        .setThumbnail(matchChunk[0][0].league.logo)
+                        .setThumbnail(matchChunk[0].league.logo)
                         .setTimestamp();
 
                     for (const match of matchChunk) {
@@ -92,7 +92,7 @@ export async function updateAllScores(client) {
             if (!channel) continue;
 
             for (const competitionId in server.messages[dateRange]) {
-                const messageIds = server.messages[dateRange][competitionId];
+                const messageIds = server.messages[dateRange][competitionId].flat();
                 const competitionMatches = matchesByCompetitions[competitionId];
 
                 if (!messageIds || !competitionMatches) continue;
