@@ -47,7 +47,6 @@ export async function postWeeklyOverviews(client) {
                 if (!competitionMatches) continue;
                 const competitionName = COMPETITION_NAMES.filter(c => c.value === competition.id)[0].name;
                 const competitionMatchesChunk = chunkArray(competitionMatches, 6);
-                console.log(competitionMatchesChunk);
                 for (const matchChunk of competitionMatchesChunk) {
                     console.log(matchChunk);
                     let embed = new EmbedBuilder()
@@ -95,13 +94,12 @@ export async function updateAllScores(client) {
             for (const competitionId in server.messages[dateRange]) {
                 const messageIds = server.messages[dateRange][competitionId].flat();
                 const competitionMatches = matchesByCompetitions[competitionId];
-
+                const competitionMatchesChunk = chunkArray(competitionMatches, 6);
                 if (!messageIds || !competitionMatches) continue;
                 for (const messageId of messageIds) {
                     const competitionName = COMPETITION_NAMES.filter(c => c.value === `${competitionId}`)[0].name;
-                    const competitionMatchesChunk = chunkArray(competitionMatches, 6);
+
                     for (const chunkMatches of competitionMatchesChunk) {
-                        console.log(chunkMatches);
                         let newEmbed = new EmbedBuilder()
                             .setColor('#0099ff')
                             .setTitle(`📅 Programme - ${competitionName}`)
