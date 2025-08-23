@@ -4,7 +4,7 @@ import 'dotenv/config';
 import {addCompetition, removeCompetition, setServerChannel} from "./serverConfig.js";
 import {deleteCompetitionMessage, postCompetitionMessage} from "./match.js";
 import * as cron from "node-cron";
-import {COMPETITION_NAMES, postWeeklyOverviews, updateAllScores} from "./scheduledTasks.js";
+import {COMPETITION_MAP, postWeeklyOverviews, updateAllScores} from "./scheduledTasks.js";
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.once(Events.ClientReady, async c => {
@@ -49,7 +49,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
     if (commandName === 'add-competition' || commandName === 'remove-competition') {
         const competition = options.getString('competition');
-        const competitionName = COMPETITION_NAMES.filter(c => c.value === competition)[0].name;
+        const competitionName = COMPETITION_MAP.filter((k,v) => k === competition)[0].name;
         try {
             if (commandName === 'add-competition') {
                 await postCompetitionMessage(guild, competition)
