@@ -49,6 +49,7 @@ export async function postWeeklyOverviews(client) {
                 const competitionName = COMPETITION_NAMES.filter(c => c.value === competition.id)[0].name;
                 const competitionMatchesChunk = chunkArray(competitionMatches, 6);
                 for (const matchChunk of competitionMatchesChunk) {
+                    console.log(matchChunk);
                     let embed = new EmbedBuilder()
                         .setColor('#0099ff')
                         .setTitle(`📅 Programme - ${competitionName}`)
