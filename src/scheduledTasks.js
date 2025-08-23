@@ -88,12 +88,12 @@ export async function updateAllScores(client) {
         if (!server.channelId || !server.messages?.[dateRange]) continue;
 
         try {
-            console.log(server.channelId);
             const channel = await client.channels.fetch(server.channelId);
             if (!channel) continue;
 
             for (const competitionId in server.messages[dateRange]) {
                 const messageIds = server.messages[dateRange][competitionId].flat();
+                console.log(competitionId);
                 const competitionMatches = matchesByCompetitions[competitionId];
 
                 if (!messageIds || !competitionMatches) continue;
