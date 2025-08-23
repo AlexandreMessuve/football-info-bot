@@ -40,16 +40,38 @@ export async function getWeeklyMatchesByLeague(leagueId, from, to) {
         // On combine les données originales des matchs avec leurs événements respectifs
         return  matches.map((match, index) => {
             const matchEvents = allEventsResults[index];
-            return {
+            const matche = {
                 id: match.fixture.id,
                 status: match.fixture.status,
                 date: match.fixture.timestamp,
-                league: match.league,
-                teams: match.teams,
-                goals: match.goals,
-                score: match.score,
-                events: matchEvents?.filter(event => ['Goal', 'Card'].includes(event.type) && event.detail !== 'Missed Penalty'),
+                league: match.league.name,
+                homeTeam: {
+                    name: match.teams.home.name,
+                    score: match.goals.home ?? 0,
+                    events: []
+                },
+                awayTeam: {
+                    name: match.teams.away.name,
+                    score: match.goals.away ?? 0,
+                    events: [],
+                },
             };
+            if (matchEvents && matchEvents.length > 0) {
+                matchEvents.filter(event => ['Goal', 'Card'].includes(event.type) && event.detail !== 'Missed Penalty').forEach(event => {
+                    const simpleEvent = {
+                        minute: event.time.elapsed + '"',
+                        player: event.player.name,
+                        type: event.type === 'Card' ? (event.detail === 'Yellow Card' ? '🟨 ' : '🟥 ') : `⚽ ${event.detail === 'Penalty' ? '(pen)' : ''}`,
+                        detail: event.detail
+                    };
+
+                    if (event.team.id === match.teams.home.id) {
+                        matche.homeTeam.events.push(simpleEvent);
+                    } else if (event.team.id === match.teams.away.id) {
+                        matche.awayTeam.events.push(simpleEvent);
+                    }
+                });
+            }
         });
     } catch (error) {
         console.error("Erreur lors de la récupération des matchs :", error.message);

@@ -6,12 +6,11 @@
 export function createMatchField(embed, match) {
     const timeStampDateMatch = match.date;
     const matchTime = `<t:${timeStampDateMatch}:F> (<t:${timeStampDateMatch}:R>)`;
-    const formatedMatch = formatMatchForUI(match);
-    const homeEventsString = formatedMatch.homeTeam.events
+    const homeEventsString = match.homeTeam.events
         .map(event => `${event.type} ${event.player} ${event.minute}'`)
         .join('\n') || '\u200B'; // '\u200B' est un espace vide pour éviter un champ vide
 
-    const awayEventsString = formatedMatch.awayTeam.events
+    const awayEventsString = match.awayTeam.events
         .map(event => `${event.type} ${event.player} ${event.minute}'`)
         .join('\n') || '\u200B';
 
@@ -27,10 +26,10 @@ export function createMatchField(embed, match) {
         statusText = `▶️ **Coup d'envoi**: ${matchTime}`;
     }
 
-    const scoreOrVs = ['NS', 'TBD', 'PST', 'CANC', 'ABD', 'AWD'].includes(statusShort) ? 'VS' : `${formatedMatch.homeTeam.score} - ${formatedMatch.awayTeam.score}`;
+    const scoreOrVs = ['NS', 'TBD', 'PST', 'CANC', 'ABD', 'AWD'].includes(statusShort) ? 'VS' : `${match.homeTeam.score} - ${match.awayTeam.score}`;
         embed.addFields(
             {
-                name: formatedMatch.homeTeam.name,
+                name: match.homeTeam.name,
                 value: homeEventsString,
                 inline: true
             },
@@ -40,7 +39,7 @@ export function createMatchField(embed, match) {
                 inline: true
             },
             {
-                name: formatedMatch.awayTeam.name,
+                name: match.awayTeam.name,
                 value: awayEventsString,
                 inline: true
             },
@@ -52,43 +51,6 @@ export function createMatchField(embed, match) {
 
 
     return embed;
-}
-
-function formatMatchForUI(match) {
-    const formattedMatch = {
-        league: match.league.name,
-        status: match.status.long,
-        homeTeam: {
-            name: match.teams.home.name,
-            score: match.goals.home ?? 0,
-            events: []
-        },
-        awayTeam: {
-            name: match.teams.away.name,
-            score: match.goals.away ?? 0,
-            events: []
-        }
-    };
-
-    console.log(formattedMatch);
-    if (match.events && match.events.length > 0) {
-        match.events.forEach(event => {
-            const simpleEvent = {
-                minute: event.time.elapsed + '"',
-                player: event.player.name,
-                type: event.type === 'Card' ? (event.detail === 'Yellow Card' ? '🟨 ' : '🟥 ') : `⚽ ${event.detail === 'Penalty' ? '(pen)' : ''}`,
-                detail: event.detail
-            };
-
-            if (event.team.id === match.teams.home.id) {
-                formattedMatch.homeTeam.events.push(simpleEvent);
-            } else if (event.team.id === match.teams.away.id) {
-                formattedMatch.awayTeam.events.push(simpleEvent);
-            }
-        });
-    }
-
-    return formattedMatch;
 }
 
 
