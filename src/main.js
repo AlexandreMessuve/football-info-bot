@@ -16,7 +16,7 @@ client.once(Events.ClientReady, async c => {
         timezone: "Europe/Paris"
     });
 
-    cron.schedule('*/5 * * * *', () => {
+    cron.schedule('*/1 * * * *', () => {
         console.log('🔄️ Vérification et mise à jour des scores...');
         updateAllScores(client);
     }, {

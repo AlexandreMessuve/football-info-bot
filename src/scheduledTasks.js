@@ -93,12 +93,11 @@ export async function updateAllScores(client) {
 
             for (const competitionId in server.messages[dateRange]) {
                 const messageIds = server.messages[dateRange][competitionId].flat();
-                console.log(competitionId);
                 const competitionMatches = matchesByCompetitions[competitionId];
 
                 if (!messageIds || !competitionMatches) continue;
                 for (const messageId of messageIds) {
-                    const competitionName = COMPETITION_NAMES.filter(c => c.value === competitionId)[0].name;
+                    const competitionName = COMPETITION_NAMES.filter(c => c.value === `${competitionId}`)[0].name;
                     const competitionMatchesChunk = chunkArray(competitionMatches, 6);
                     for (const chunkMatches of competitionMatchesChunk) {
                         let newEmbed = new EmbedBuilder()
