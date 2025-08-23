@@ -70,6 +70,7 @@ function formatMatchForUI(match) {
         }
     };
 
+    console.log(formattedMatch);
     if (match.events && match.events.length > 0) {
         match.events.forEach(event => {
             const simpleEvent = {

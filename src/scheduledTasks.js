@@ -107,7 +107,6 @@ export async function updateAllScores(client) {
                             .setTimestamp();
 
                         for (const match of chunkMatches) {
-                            console.log(match);
                             newEmbed = createMatchField(newEmbed, match);
                         }
 
