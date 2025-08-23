@@ -8,11 +8,11 @@ export function createMatchField(embed, match) {
     const matchTime = `<t:${timeStampDateMatch}:F> (<t:${timeStampDateMatch}:R>)`;
     const homeEventsString = match.homeTeam.events
         .map(event => `${event.type} ${event.player} ${event.minute}'`)
-        .join('\n') || '\u200B'; // '\u200B' est un espace vide pour éviter un champ vide
+        .join('\n') || ''; // '\u200B' est un espace vide pour éviter un champ vide
 
     const awayEventsString = match.awayTeam.events
         .map(event => `${event.type} ${event.player} ${event.minute}'`)
-        .join('\n') || '\u200B';
+        .join('\n') || '';
 
     let statusText;
     const statusShort = match.status.short;
