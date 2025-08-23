@@ -40,12 +40,14 @@ export async function getWeeklyMatchesByLeague(leagueId, from, to) {
         // On combine les données originales des matchs avec leurs événements respectifs
         return  matches.map((match, index) => {
             const matchEvents = allEventsResults[index];
-            console.log(match);
             const matche = {
                 id: match.fixture.id,
                 status: match.fixture.status,
                 date: match.fixture.timestamp,
-                league: match.league,
+                league: {
+                    name: match.league.name,
+                    logo: match.league.logo,
+                },
                 homeTeam: {
                     name: match.teams.home.name,
                     score: match.goals.home ?? 0,
