@@ -9,13 +9,11 @@ import 'dotenv/config';
  */
 export async function setServerChannel(guildId, channelId) {
     const serverCollection = db.collection('match');
-    return await serverCollection.insertOne(
+    return await serverCollection.updateOne(
+        {guildId},
         {$set: {
-            discordServer: {
                 guildId,
                 channelId
-            }
-
             }},
         {upsert: true}
     );
