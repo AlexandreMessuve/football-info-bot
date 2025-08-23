@@ -92,31 +92,33 @@ export async function updateAllScores(client) {
 
             for (const competitionId in server.messages[dateRange]) {
                 const messageIds = server.messages[dateRange][competitionId].flat();
-                const competitionMatches = matchesByCompetitions[competitionId];
+                const competitionsMatches = matchesByCompetitions[competitionId];
+                if (!messageIds || !competitionsMatches) continue;
 
-                if (!messageIds || !competitionMatches) continue;
-                for (const messageId of messageIds) {
+                for (const competitionMatches of competitionsMatches) {
                     const competitionName = COMPETITION_NAMES.filter(c => c.value === `${competitionId}`)[0].name;
                     const competitionMatchesChunk = chunkArray(competitionMatches, 6);
-                    for (const chunkMatches of competitionMatchesChunk) {
-                        let newEmbed = new EmbedBuilder()
-                            .setColor('#0099ff')
-                            .setTitle(`📅 Programme - ${competitionName}`)
-                            .setThumbnail(chunkMatches[0].league.logo)
-                            .setTimestamp();
+                        for (const chunkMatches of competitionMatchesChunk) {
+                            for (const messageId of messageIds) {
+                            let newEmbed = new EmbedBuilder()
+                                .setColor('#0099ff')
+                                .setTitle(`📅 Programme - ${competitionName}`)
+                                .setThumbnail(chunkMatches[0].league.logo)
+                                .setTimestamp();
 
-                        for (const match of chunkMatches) {
-                            newEmbed = createMatchField(newEmbed, match);
-                        }
+                            for (const match of chunkMatches) {
+                                newEmbed = createMatchField(newEmbed, match);
+                            }
 
-                        try {
-                            const originalMessage = await channel.messages.fetch(messageId);
-                            await originalMessage.edit({embeds: [newEmbed]});
-                        } catch (editError) {
-                            if (editError.code === 10008) { // Unknown Message
-                                console.warn(`[Update] Message ${messageId} on server ${server.guildId} was deleted. Consider cleaning the DB.`);
-                            } else {
-                                console.error(`[Update] Failed to edit message ${messageId}:`, editError.message);
+                            try {
+                                const originalMessage = await channel.messages.fetch(messageId);
+                                await originalMessage.edit({embeds: [newEmbed]});
+                            } catch (editError) {
+                                if (editError.code === 10008) { // Unknown Message
+                                    console.warn(`[Update] Message ${messageId} on server ${server.guildId} was deleted. Consider cleaning the DB.`);
+                                } else {
+                                    console.error(`[Update] Failed to edit message ${messageId}:`, editError.message);
+                                }
                             }
                         }
                     }
