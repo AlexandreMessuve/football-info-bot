@@ -1,6 +1,6 @@
 import { getServerConfig, removeMessageId, setMessageId } from "./serverConfig.js";
-import { getDateRange } from "./util.js";
-import { getDailyMatches } from "./footballApi.js"; // Renamed for clarity
+import {chunkArray, getDateRange} from "./util.js";
+import {getWeeklyMatchesByLeague} from "./footballApi.js"; // Renamed for clarity
 import { EmbedBuilder } from "discord.js";
 import { createMatchField } from "./embedHelper.js";
 import { COMPETITION_NAMES } from "./scheduledTasks.js"; // Assuming this is your map of names
@@ -16,27 +16,22 @@ export async function deleteCompetitionMessage(guild, competitionId) {
     const range = `${dateFrom}_${dateTo}`;
 
     // Safely get the messageId using optional chaining
-    const messageId = serverConfig?.messages?.[range]?.[competitionId];
+    const messageIds = serverConfig?.messages?.[range]?.[competitionId];
 
-    if (!messageId || !serverConfig.channelId) {
+    if (!messageIds || !serverConfig.channelId) {
         console.log(`[Delete] No message found for competition ${competitionId} in server ${guild.name}.`);
         return;
     }
+        try {
+            const channel = await guild.channels.fetch(serverConfig.channelId);
+            await channel.bulkDelete(messageIds.flat(), true);
+            console.log(`[Delete] Successfully bulk delete ${messageIds.length} messages from channel ${channel.name}.`);
 
-    try {
-        const channel = await guild.channels.fetch(serverConfig.channelId);
-        await channel.messages.delete(messageId);
-        console.log(`[Delete] Successfully deleted message ${messageId} from channel ${channel.name}.`);
-    } catch (error) {
-        if (error.code === 10008) { // Unknown Message
-            console.warn(`[Delete] Message ${messageId} was already deleted on Discord.`);
-        } else {
-            console.error(`[Delete] Failed to delete message ${messageId}:`, error.message);
+            await removeMessageId(guild.id, competitionId, range);
+            console.log(`[Delete] Removed all message IDs for competition ${competitionId} from database.`);
+        } catch (error) {
+            console.error(`[Delete] Failed to delete messages for competition ${competitionId} in server ${guild.name}:`, error.message);
         }
-    } finally {
-        // Always try to remove the reference from the DB
-        await removeMessageId(guild.id, competitionId, range);
-    }
 }
 
 /**
@@ -52,7 +47,7 @@ export async function postCompetitionMessage(guild, competitionId) {
     if (!serverConfig || !serverConfig.channelId) return;
 
     // Use await and fetch matches only for the needed competition
-    const matches = await getDailyMatches(competitionId, dateFrom, dateTo);
+    const matches = await getWeeklyMatchesByLeague(competitionId, dateFrom, dateTo);
 
     if (!matches || matches.length === 0) {
         console.log(`[Post] No matches found for competition ${competitionId}.`);
@@ -63,20 +58,25 @@ export async function postCompetitionMessage(guild, competitionId) {
         const channel = await guild.channels.fetch(serverConfig.channelId);
 
         const competitionName = COMPETITION_NAMES.filter(c => c.value === competitionId)[0].name;
-        const embed = new EmbedBuilder()
-            .setColor('#0099ff')
-            .setTitle(`📅 Programme - ${competitionName}`)
-            .setTimestamp();
+        const matchesChunk = chunkArray(matches, 6);
+        for (const matcheChunk of matchesChunk) {
+                    let embed = new EmbedBuilder()
+                        .setColor("#0099ff")
+                        .setTitle(`📅 Programme - ${competitionName}`)
+                        .setThumbnail(matcheChunk[0].league.logo)
+                        .setTimestamp();
 
-        const fields = matches.map(createMatchField);
-        embed.addFields(fields.slice(0, 25)); // Safety limit
+                    for(const match of matcheChunk) {
+                        embed = createMatchField(embed, match);
+                    }
 
-        const sentMessage = await channel.send({ embeds: [embed] });
+                    const sentMessage = await channel.send({ embeds: [embed] });
 
-        // The setMessageId function handles all database logic
-        await setMessageId(guild.id, competitionId, sentMessage.id, range);
-        console.log(`[Post] Successfully posted message for ${competitionId} in server ${guild.name}.`);
+                    // The setMessageId function handles all database logic
+                    await setMessageId(guild.id, competitionId, sentMessage.id, range);
+                    console.log(`[Post] Successfully posted message for ${competitionId} in server ${guild.name}.`);
 
+        }
     } catch (error) {
         console.error(`[Post] Failed to post message for ${competitionId} in server ${guild.name}:`, error.message);
     }

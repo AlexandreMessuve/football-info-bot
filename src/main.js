@@ -4,7 +4,7 @@ import 'dotenv/config';
 import {addCompetition, removeCompetition, setServerChannel} from "./serverConfig.js";
 import {deleteCompetitionMessage, postCompetitionMessage} from "./match.js";
 import * as cron from "node-cron";
-import {postWeeklyOverviews, updateAllScores} from "./scheduledTasks.js";
+import {COMPETITION_NAMES, postWeeklyOverviews, updateAllScores} from "./scheduledTasks.js";
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 client.once(Events.ClientReady, async c => {
@@ -16,7 +16,7 @@ client.once(Events.ClientReady, async c => {
         timezone: "Europe/Paris"
     });
 
-    cron.schedule('*/15 * * * *', () => {
+    cron.schedule('*/5 * * * *', () => {
         console.log('🔄️ Vérification et mise à jour des scores...');
         updateAllScores(client);
     }, {
@@ -49,12 +49,14 @@ client.on(Events.InteractionCreate, async interaction => {
 
     if (commandName === 'add-competition' || commandName === 'remove-competition') {
         const competition = options.getString('competition');
+        const competitionName = COMPETITION_NAMES.filter(c => c.value === competition)[0].name;
         try {
             if (commandName === 'add-competition') {
                 await postCompetitionMessage(guild, competition)
                 await addCompetition(
                     guildId,
-                    competition
+                    competition,
+                    competitionName
                 );
                 await interaction.editReply({ content: "Le championnat a été ajouté et son programme a été posté !"});
             }else{
