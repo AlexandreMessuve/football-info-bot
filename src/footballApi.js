@@ -44,7 +44,7 @@ export async function getWeeklyMatchesByLeague(leagueId, from, to) {
                 id: match.fixture.id,
                 status: match.fixture.status,
                 date: match.fixture.timestamp,
-                league: match.league.name,
+                league: match.league,
                 homeTeam: {
                     name: match.teams.home.name,
                     score: match.goals.home ?? 0,
