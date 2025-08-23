@@ -18,7 +18,7 @@ export const COMPETITION_NAMES = [
 ]
 
 async function getMatches(uniqueCompetitions, from, to) {
-    const matchesByCompetitions = {};
+    const matchesByCompetitions = [];
     for (const c of uniqueCompetitions) {
         const matches = await getWeeklyMatchesByLeague(c.id, from, to);
 
