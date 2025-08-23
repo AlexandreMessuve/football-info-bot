@@ -45,9 +45,9 @@ export async function postWeeklyOverviews(client) {
             for (const competition of server.competitions) {
                 const competitionMatches = matchesByCompetitions[competition.id];
                 if (!competitionMatches) continue;
-
                 const competitionName = COMPETITION_NAMES.filter(c => c.value === competition.id)[0].name;
                 const competitionMatchesChunk = chunkArray(competitionMatches, 6);
+                console.log(competitionMatchesChunk);
                 for (const matchChunk of competitionMatchesChunk) {
                     console.log(matchChunk);
                     let embed = new EmbedBuilder()
@@ -101,6 +101,7 @@ export async function updateAllScores(client) {
                     const competitionName = COMPETITION_NAMES.filter(c => c.value === `${competitionId}`)[0].name;
                     const competitionMatchesChunk = chunkArray(competitionMatches, 6);
                     for (const chunkMatches of competitionMatchesChunk) {
+                        console.log(chunkMatches);
                         let newEmbed = new EmbedBuilder()
                             .setColor('#0099ff')
                             .setTitle(`📅 Programme - ${competitionName}`)
