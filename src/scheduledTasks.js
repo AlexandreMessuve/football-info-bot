@@ -18,14 +18,13 @@ export const COMPETITION_NAMES = [
 ]
 
 async function getMatches(uniqueCompetitions, from, to) {
-    const matchesByCompetitions = [];
+    const matchesByCompetitions = {};
     for (const c of uniqueCompetitions) {
         const matches = await getWeeklyMatchesByLeague(c.id, from, to);
-        if (!matches) continue;
-        if (!matchesByCompetitions[c.id]) {
-            matchesByCompetitions[c.id] = [];
+
+        if (matches && matches.length > 0) {
+            matchesByCompetitions[c.id] = matches;
         }
-        matchesByCompetitions[c.id].push(matches);
     }
     return matchesByCompetitions;
 }
