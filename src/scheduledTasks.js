@@ -100,7 +100,6 @@ export async function updateAllScores(client) {
                     const competitionName = COMPETITION_NAMES.filter(c => c.value === `${competitionId}`)[0].name;
                     const competitionMatchesChunk = chunkArray(competitionMatches, 6);
                     for (const chunkMatches of competitionMatchesChunk) {
-                        console.log(chunkMatches[0]);
                         let newEmbed = new EmbedBuilder()
                             .setColor('#0099ff')
                             .setTitle(`📅 Programme - ${competitionName}`)

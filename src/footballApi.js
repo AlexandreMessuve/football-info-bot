@@ -75,6 +75,7 @@ export async function getWeeklyMatchesByLeague(leagueId, from, to) {
                     }
                 });
             }
+            return matche;
         });
     } catch (error) {
         console.error("Erreur lors de la récupération des matchs :", error.message);
