@@ -97,6 +97,7 @@ export async function updateAllScores(client) {
 
                 if (!messageIds || !competitionMatches) continue;
                 for (const messageId of messageIds) {
+                    console.log(COMPETITION_NAMES.filter(c => c.value === `${competitionId}`))
                     const competitionName = COMPETITION_NAMES.filter(c => c.value === `${competitionId}`)[0].name;
                     const competitionMatchesChunk = chunkArray(competitionMatches, 6);
                     for (const chunkMatches of competitionMatchesChunk) {
