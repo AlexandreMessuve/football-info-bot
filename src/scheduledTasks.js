@@ -52,7 +52,7 @@ export async function postWeeklyOverviews(client) {
                     let embed = new EmbedBuilder()
                         .setColor('#0099ff')
                         .setTitle(`📅 Programme - ${competitionName}`)
-                        .setThumbnail(matchChunk[0].league.logo)
+                        .setThumbnail(matchChunk[0][0].league.logo)
                         .setTimestamp();
 
                     for (const match of matchChunk) {
@@ -103,7 +103,7 @@ export async function updateAllScores(client) {
                         let newEmbed = new EmbedBuilder()
                             .setColor('#0099ff')
                             .setTitle(`📅 Programme - ${competitionName}`)
-                            .setThumbnail(chunkMatches[0].league.logo)
+                            .setThumbnail(chunkMatches[0][0].league.logo)
                             .setTimestamp();
 
                         for (const match of chunkMatches) {
