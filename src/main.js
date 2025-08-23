@@ -17,8 +17,13 @@ client.once(Events.ClientReady, async c => {
     });
 
     cron.schedule('*/1 * * * *', () => {
+        const hoursNow = new Date().getHours();
+        if(hoursNow >= 12 && hoursNow <= 23){
         console.log('🔄️ Vérification et mise à jour des scores...');
         updateAllScores(client);
+        }else{
+            console.log("C'est l'heure de dodo");
+        }
     }, {
         timezone: "Europe/Paris"
     });
