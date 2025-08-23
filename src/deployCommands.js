@@ -1,6 +1,11 @@
 import {ApplicationCommandOptionType, REST, Routes} from 'discord.js';
 import 'dotenv/config';
-import {COMPETITION_NAMES} from "./scheduledTasks.js";
+import {COMPETITION_MAP} from "./scheduledTasks.js";
+
+const choices = []
+for (const [key, value] of COMPETITION_MAP.entries()) {
+    choices.push({ name: value, value: key });
+}
 
 const commands = [
     {
@@ -23,7 +28,7 @@ const commands = [
             type: ApplicationCommandOptionType.String,
             description: 'Choisissez un championnat à ajouter',
             required: true,
-            choices: COMPETITION_NAMES
+            choices: choices
         }]
     },
     {
@@ -34,7 +39,7 @@ const commands = [
             type: ApplicationCommandOptionType.String,
             description: 'Choisissez un championnat à supprimer',
             required: true,
-            choices: COMPETITION_NAMES
+            choices: choices
         }]
     }
 ];

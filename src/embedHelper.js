@@ -27,27 +27,27 @@ export function createMatchField(embed, match) {
     }
 
     const scoreOrVs = ['NS', 'TBD', 'PST', 'CANC', 'ABD', 'AWD'].includes(statusShort) ? 'VS' : `${match.homeTeam.score} - ${match.awayTeam.score}`;
-        embed.addFields(
-            {
-                name: match.homeTeam.name,
-                value: homeEventsString,
-                inline: true
-            },
-            {
-                name: scoreOrVs,
-                value: '\u200B',
-                inline: true
-            },
-            {
-                name: match.awayTeam.name,
-                value: awayEventsString,
-                inline: true
-            },
-            {
-                name: statusText,
-                value: '⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯',
-            }
-        );
+    embed.addFields(
+        {
+            name: match.homeTeam.name,
+            value: homeEventsString,
+            inline: true
+        },
+        {
+            name: scoreOrVs,
+            value: '\u200B',
+            inline: true
+        },
+        {
+            name: match.awayTeam.name,
+            value: awayEventsString,
+            inline: true
+        },
+        {
+            name: statusText,
+            value: '⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯',
+        }
+    );
 
 
     return embed;
