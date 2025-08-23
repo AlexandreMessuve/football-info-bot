@@ -88,6 +88,7 @@ export async function updateAllScores(client) {
         if (!server.channelId || !server.messages?.[dateRange]) continue;
 
         try {
+            console.log(server.channelId);
             const channel = await client.channels.fetch(server.channelId);
             if (!channel) continue;
 
