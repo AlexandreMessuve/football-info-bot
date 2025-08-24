@@ -1,9 +1,9 @@
 import { getServerConfig, removeMessageId, setMessageId } from "./serverConfig.js";
 import {chunkArray, getDateRange} from "./util.js";
-import {getWeeklyMatchesByLeague} from "./footballApi.js"; // Renamed for clarity
+import {getWeeklyMatchesByLeague} from "./footballApi.js";
 import { EmbedBuilder } from "discord.js";
 import { createMatchField } from "./embedHelper.js";
-import { COMPETITION_MAP } from "./scheduledTasks.js"; // Assuming this is your map of names
+import { COMPETITION_MAP } from "./scheduledTasks.js";
 
 /**
  * Finds and deletes a specific competition message from a server.
@@ -57,7 +57,7 @@ export async function postCompetitionMessage(guild, competitionId) {
     try {
         const channel = await guild.channels.fetch(serverConfig.channelId);
 
-        const competitionName = COMPETITION_MAP.filter((k,v) => k === competitionId)[0].name;
+        const competitionName = COMPETITION_MAP.get(competitionId);
         const matchesChunk = chunkArray(matches, 6);
         for (const matcheChunk of matchesChunk) {
                     let embed = new EmbedBuilder()

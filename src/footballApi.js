@@ -1,4 +1,7 @@
 import axios from 'axios';
+import {chunkArray} from "./util.js";
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
 
 /**
  *
@@ -22,25 +25,27 @@ export async function getWeeklyMatchesByLeague(leagueId, from, to) {
             }
         });
 
-        const matches = response.data.response;
+        const allMatches = response.data.response;
 
-        // On prépare un tableau de promesses pour les détails des matchs
-        const detailPromises = matches.map(match => {
-            if (match.fixture.status.elapsed !== null) {
-                // Si le match est live/terminé, on retourne la promesse de fetch des détails
-                return getMatchDetails(match.fixture.id);
-            }
-            // Sinon, on retourne une promesse qui se résout immédiatement avec un tableau vide
-            return Promise.resolve([]);
-        });
+        if(allMatches.length === 0) return [];
 
-        // On exécute toutes les promesses en parallèle
-        const allEventsResults = await Promise.all(detailPromises);
+        const matchesDetails = allMatches.filter(m => m.fixture.status.elapsed !== null);
+        const matchChunks = chunkArray(matchesDetails, 5);
+        const allEvents = new Map();
+        for (const chunk of matchChunks) {
+            const eventsResults = await Promise.allSettled(chunk.map(match => getMatchDetails(match.fixture.id)));
+            eventsResults.forEach((result, index) => {
+                if (result.status === 'fulfilled') {
+                    const matchId = chunk[index].fixture.id;
+                    allEvents.set(matchId, result.value);
+                }
+            });
+            await delay(1000);
+        }
 
-        // On combine les données originales des matchs avec leurs événements respectifs
-        return  matches.map((match, index) => {
-            const matchEvents = allEventsResults[index];
-            const matche = {
+        return  allMatches.map((match) => {
+            const matchEvents = allEvents.get(match.fixture.id);
+            const formatedMatch = {
                 id: match.fixture.id,
                 status: match.fixture.status,
                 date: match.fixture.timestamp,
@@ -69,13 +74,13 @@ export async function getWeeklyMatchesByLeague(leagueId, from, to) {
                     };
 
                     if (event.team.id === match.teams.home.id) {
-                        matche.homeTeam.events.push(simpleEvent);
+                        formatedMatch.homeTeam.events.push(simpleEvent);
                     } else if (event.team.id === match.teams.away.id) {
-                        matche.awayTeam.events.push(simpleEvent);
+                        formatedMatch.awayTeam.events.push(simpleEvent);
                     }
                 });
             }
-            return matche;
+            return formatedMatch;
         });
     } catch (error) {
         console.error("Erreur lors de la récupération des matchs :", error.message);

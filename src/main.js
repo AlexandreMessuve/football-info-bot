@@ -15,18 +15,15 @@ client.once(Events.ClientReady, async c => {
     }, {
         timezone: "Europe/Paris"
     });
-
-    cron.schedule('*/1 * * * *', () => {
+    setInterval(() => {
         const hoursNow = new Date().getHours();
         if(hoursNow >= 12 && hoursNow <= 23){
-        console.log('🔄️ Vérification et mise à jour des scores...');
-        updateAllScores(client);
+            console.log('🔄️ Vérification et mise à jour des scores...');
+            updateAllScores(client);
         }else{
             console.log("C'est l'heure de dodo");
         }
-    }, {
-        timezone: "Europe/Paris"
-    });
+    }, (1000 * 60));
 });
 
 
@@ -54,22 +51,24 @@ client.on(Events.InteractionCreate, async interaction => {
 
     if (commandName === 'add-competition' || commandName === 'remove-competition') {
         const competition = options.getString('competition');
-        const competitionName = COMPETITION_MAP.filter((k,v) => k === competition)[0].name;
+        const competitionName = COMPETITION_MAP.get(competition);
+        if (!competitionName) {
+            await interaction.editReply({ content: "Compétition is invalid"});
+        }
         try {
             if (commandName === 'add-competition') {
-                await postCompetitionMessage(guild, competition)
-                await addCompetition(
-                    guildId,
-                    competition,
-                    competitionName
+                await Promise.all(
+                    [
+                        postCompetitionMessage(guild, competition),
+                        addCompetition(guildId, competition, competitionName)
+                    ]
                 );
                 await interaction.editReply({ content: "Le championnat a été ajouté et son programme a été posté !"});
             }else{
-                await deleteCompetitionMessage(guild, competition);
-                await removeCompetition(
-                    guildId,
-                    competition
-                );
+                await Promise.all([
+                    deleteCompetitionMessage(guild, competition),
+                    removeCompetition(guildId, competition)
+                ]);
                 await interaction.editReply({ content: "Le championnat a bien été supprimer"});
             }
         }catch (e) {

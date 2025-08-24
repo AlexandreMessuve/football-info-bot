@@ -19,14 +19,13 @@ export const COMPETITION_MAP = new Map([
 
 
 async function getMatches(uniqueCompetitions, from, to) {
-    const matchesByCompetitions = {};
-    const competitionPromises = Array.from(uniqueCompetitions).map(async (c) => {
+    const matchesByCompetitions = new Map();
+    for (const c of uniqueCompetitions) {
         const matches = await getWeeklyMatchesByLeague(c.id, from, to);
         if (matches && matches.length > 0) {
-            matchesByCompetitions[c.id] = matches;
+            matchesByCompetitions.set(c.id, matches);
         }
-    });
-    await Promise.all(competitionPromises);
+    }
     return matchesByCompetitions;
 }
 
@@ -58,7 +57,7 @@ export async function postWeeklyOverviews(client) {
         try {
             const channel = await client.channels.fetch(server.channelId);
             for (const competition of server.competitions) {
-                const competitionMatches = matchesByCompetitions[competition.id];
+                const competitionMatches = matchesByCompetitions.get(competition.id);
                 if (!competitionMatches) continue;
 
                 const competitionName = COMPETITION_MAP.get(competition.id);
@@ -94,7 +93,7 @@ export async function updateAllScores(client) {
 
             for (const competitionId in server.messages[dateRange]) {
                 const messageIds = server.messages[dateRange][competitionId].flat();
-                const competitionMatches = matchesByCompetitions[competitionId];
+                const competitionMatches = matchesByCompetitions.get(competitionId);
                 if (!messageIds || !competitionMatches) continue;
 
                 const competitionName = COMPETITION_MAP.get(competitionId);
