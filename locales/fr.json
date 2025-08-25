@@ -1,0 +1,10 @@
+{
+    "errorMessage": "Une erreur est survenue lors de l'exécution de cette commande.",
+    "noPermission": "Vous n'avez pas la permission d'exécuter cette commande.",
+    "invalidLeagueID": "Le championnat avec l'ID **{{leagueID}}** est invalide.",
+    "configureChannelSuccess": "Le canal {{ channelName }} a été configuré avec succès",
+    "addLeagueSuccess": "Le championnat **{{leagueName}}** a été ajouté avec succès !",
+    "addLeagueAlreadyExists": "Le championnat **{{leagueName}}** est déjà dans votre liste.",
+    "removeLeagueSuccess": "Le championnat **{{leagueName}}** a été supprimé avec succès !",
+    "removeLeagueNotFound": "Le championnat **{{leagueName}}** n'a pas été trouvé dans votre liste."
+}

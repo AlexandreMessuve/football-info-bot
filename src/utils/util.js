@@ -1,4 +1,27 @@
 import {endOfWeek, format, startOfWeek} from "date-fns";
+import LEAGUE_MAP from "../data/league.js";
+import {getServerConfig} from "../db/serverConfig.js";
+export const delay = ms => new Promise(res => setTimeout(res, ms));
+
+export async function getChoice(guildId, type) {
+    const server = await getServerConfig(guildId);
+    const configuredLeagues = new Set((server.leagues || []).map(l => l.id));
+    if(type === 'remove' && configuredLeagues.length === 0) return [];
+
+    const allLeagues = Array.from(LEAGUE_MAP.entries());
+    let filteredLeagues = [];
+
+    if (type === 'add'){
+        filteredLeagues = allLeagues.filter(([id, name]) => !configuredLeagues.has(id))
+    }else{
+        filteredLeagues = allLeagues.filter(([id, name]) => configuredLeagues.has(id))
+    }
+
+    return filteredLeagues.map(([id, name]) => ({
+        name,
+        value: id
+    }) );
+}
 
 export function getDateRange(){
     const today = new Date();

@@ -1,89 +1,50 @@
-import {Client, Events, GatewayIntentBits, MessageFlags} from 'discord.js';
-import { connectDB } from "./mongoConfig.js";
+import {Client, GatewayIntentBits, MessageFlags, Collection} from 'discord.js';
+import {connectDB} from "./db/mongoConfig.js";
 import 'dotenv/config';
-import {addCompetition, removeCompetition, setServerChannel} from "./serverConfig.js";
-import {deleteCompetitionMessage, postCompetitionMessage} from "./match.js";
-import * as cron from "node-cron";
-import {COMPETITION_MAP, postWeeklyOverviews, updateAllScores} from "./scheduledTasks.js";
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+import i18next from "i18next";
+import FsBackend from "i18next-fs-backend";
+import path from "path";
+const __filename = new URL('', import.meta.url).pathname;
+const __dirname = path.join(__filename, '..');
 
-client.once(Events.ClientReady, async c => {
-    console.log(`Prêt ! Connecté en tant que ${c.user.tag}`);
-    cron.schedule('0 8 * * 1', () => {
-        console.log('🗓️ Envoi des matchs de la semaine...');
-        postWeeklyOverviews(client);
-    }, {
-        timezone: "Europe/Paris"
-    });
-    setInterval(() => {
-        const hoursNow = new Date().getHours();
-        if(hoursNow >= 12 && hoursNow <= 23){
-            console.log('🔄️ Vérification et mise à jour des scores...');
-            updateAllScores(client);
-        }else{
-            console.log("C'est l'heure de dodo");
-        }
-    }, (1000 * 60));
+const localesPath = path.join(__dirname,'..', 'locales', '{{lng}}.json');
+await i18next.use(FsBackend).init({
+    fallbackLng: 'en',
+    preload: ['en', 'fr'],
+    backend: {
+        loadPath: localesPath,
+    },
+});
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds,
+    ]
 });
 
+client.commands = new Collection();
 
+const handlers = ['events', 'commands', 'errors'];
 
-
-client.on(Events.InteractionCreate, async interaction => {
-    if (!interaction.isChatInputCommand()) return;
-    if (!interaction.member.permissions.has('Administrator')) {
-        return interaction.reply({ content: "Vous n'avez pas la permission d'utiliser cette commande.", flags: [MessageFlags.Ephemeral] });
+for (const handler of handlers) {
+    const handlerImport = await import(`./handlers/${handler}.js`);
+    const handlerFunction = handlerImport.default;
+    if (typeof handlerFunction === 'function') {
+        await handlerFunction(client);
+    } else {
+        console.error(`[ERROR]: Invalid handler function in ./handlers/${handler}`);
     }
-
-    const { commandName, guild, options } = interaction;
-    const guildId = interaction.guild.id;
-    await interaction.deferReply({flags: [MessageFlags.Ephemeral]});
-    if (commandName === 'configure') {
-        const channel = options.getChannel('channel');
-        try {
-            await setServerChannel(guildId, channel.id);
-            await interaction.editReply({ content: `Canal défini sur #${channel.name}`});
-        } catch (error) {
-            console.error("Erreur lors de la configuration du serveur : ",error);
-            await interaction.editReply({ content: "Une erreur est survenue lors de la configuration."});
-        }
-    }
-
-    if (commandName === 'add-competition' || commandName === 'remove-competition') {
-        const competition = options.getString('competition');
-        const competitionName = COMPETITION_MAP.get(competition);
-        if (!competitionName) {
-            await interaction.editReply({ content: "Compétition is invalid"});
-        }
-        try {
-            if (commandName === 'add-competition') {
-                await Promise.all(
-                    [
-                        postCompetitionMessage(guild, competition),
-                        addCompetition(guildId, competition, competitionName)
-                    ]
-                );
-                await interaction.editReply({ content: "Le championnat a été ajouté et son programme a été posté !"});
-            }else{
-                await Promise.all([
-                    deleteCompetitionMessage(guild, competition),
-                    removeCompetition(guildId, competition)
-                ]);
-                await interaction.editReply({ content: "Le championnat a bien été supprimer"});
-            }
-        }catch (e) {
-            console.error(e);
-            await interaction.editReply({ content: "Une erreur est survenue."});
-        }
-    }
-});
-
-(async () => {
+}
+(async() =>{
     try {
+        console.log("[INFO] Connecting to database...");
         await connectDB();
-        console.log("Connexion à la base de données réussie.");
+        console.log("[INFO] Database connected");
+
+        console.log("[INFO] Logging in...");
         await client.login(process.env.TOKEN);
+        console.log("[INFO] Bot logged in");
     } catch (error) {
-        console.error("Échec du démarrage du bot:", error);
+        console.error("[ERROR] Bot failed to start", error);
     }
-})();
+} )()
+

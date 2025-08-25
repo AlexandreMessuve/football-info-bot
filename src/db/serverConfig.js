@@ -8,35 +8,41 @@ import 'dotenv/config';
  * @returns {Promise<*>}
  */
 export async function setServerChannel(guildId, channelId) {
-    const serverCollection = db.collection('match');
-    return await serverCollection.updateOne(
-        {guildId},
-        {$set: {
-                guildId,
-                channelId
-            }},
-        {upsert: true}
-    );
+
+    try {
+            const serverCollection = db.collection('match');
+            return await serverCollection.updateOne(
+                {guildId},
+                {$set: {
+                        guildId,
+                        channelId
+                    }},
+                {upsert: true}
+            );
+    }catch(err) {
+        console.error("[ERROR] setServerChannel:", err);
+        throw err;
+    }
+
 }
 
 /**
  *
  * @param guildId
- * @param competitionId
- * @param competitionName
+ * @param leagueId
+ * @param leagueName
  * @returns {Promise<*>}
  */
-export async function addCompetition(guildId, competitionId, competitionName) {
+export async function addLeague(guildId, leagueId, leagueName) {
     const serverCollection = db.collection('match');
-    const existingConfig = await getServerConfig(guildId);
     return await serverCollection.updateOne(
-        {_id: existingConfig._id},
+        {guildId},
         {
             $addToSet: {
-                [`competitions`]:
+                ['leagues']:
                     {
-                        id: competitionId,
-                        name: competitionName,
+                        id: leagueId,
+                        name: leagueName,
                     }
             }
         },
@@ -47,18 +53,17 @@ export async function addCompetition(guildId, competitionId, competitionName) {
 /**
  *
  * @param guildId
- * @param competitionId
+ * @param leagueId
  * @returns {Promise<*>}
  */
-export async function removeCompetition(guildId, competitionId) {
+export async function removeLeagueDb(guildId, leagueId) {
     const serverCollection = db.collection('match');
-    const existingConfig = await getServerConfig(guildId);
     return await serverCollection.updateOne(
-        {_id: existingConfig._id},
+        {guildId},
         {
             $pull: {
-                ['competitions']: {
-                    id: competitionId
+                leagues: {
+                    id: leagueId
                 }
             }
         },
@@ -68,17 +73,16 @@ export async function removeCompetition(guildId, competitionId) {
 /**
  *
  * @param guildId
- * @param competitionId
+ * @param leagueId
  * @param messageId
  * @param dateRange
  * @returns {Promise<*>}
  */
-export async function setMessageId(guildId, competitionId, messageId, dateRange) {
+export async function setMessageId(guildId, leagueId, messageId, dateRange) {
     const serverCollection = db.collection('match');
-    const existingConfig = await getServerConfig(guildId);
     return await serverCollection.updateOne(
-        {_id: existingConfig._id},
-        {$addToSet: {[`messages.${dateRange}.${competitionId}`]: [messageId]}},
+        {guildId},
+        {$addToSet: {[`messages.${dateRange}.${leagueId}`]: [messageId]}},
         {upsert: true}
     );
 }
@@ -86,16 +90,15 @@ export async function setMessageId(guildId, competitionId, messageId, dateRange)
 /**
  *
  * @param guildId
- * @param competitionId
+ * @param leagueId
  * @param dateRange
  * @returns {Promise<*>}
  */
-export async function removeMessageId(guildId, competitionId, dateRange) {
+export async function removeMessageId(guildId, leagueId, dateRange) {
     const serverCollection = db.collection('match');
-    const existingConfig = await getServerConfig(guildId);
     return await serverCollection.updateOne(
-        {_id: existingConfig._id},
-        {$unset: { [`messages.${dateRange}.${competitionId}`] : "" }},
+        {guildId},
+        {$unset: { [`messages.${dateRange}.${leagueId}`] : "" }},
         {upsert: true}
     )
 }

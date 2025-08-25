@@ -1,7 +1,5 @@
 import axios from 'axios';
-import {chunkArray} from "./util.js";
-const delay = ms => new Promise(res => setTimeout(res, ms));
-
+import {chunkArray, delay} from "../utils/util.js";
 
 /**
  *
@@ -33,7 +31,7 @@ export async function getWeeklyMatchesByLeague(leagueId, from, to) {
         const matchChunks = chunkArray(matchesDetails, 5);
         const allEvents = new Map();
         for (const chunk of matchChunks) {
-            const eventsResults = await Promise.allSettled(chunk.map(match => getMatchDetails(match.fixture.id)));
+            const eventsResults = await Promise.allSettled(chunk.map(match => getMatchEvents(match.fixture.id)));
             eventsResults.forEach((result, index) => {
                 if (result.status === 'fulfilled') {
                     const matchId = chunk[index].fixture.id;
@@ -83,7 +81,7 @@ export async function getWeeklyMatchesByLeague(leagueId, from, to) {
             return formatedMatch;
         });
     } catch (error) {
-        console.error("Erreur lors de la récupération des matchs :", error.message);
+        console.error("[ERROR] Impossible to get matches :", error.message);
         return [];
     }
 }
@@ -98,12 +96,12 @@ export async function getStandingsByLeague(leagueId) {
         });
         return response.data.response;
     } catch (error) {
-        console.error("Erreur lors de la récupération des classements :", error);
+        console.error("[ERROR] Impossible to get standings", error);
         return [];
     }
 }
 
-export async function getMatchDetails(matchId) {
+export async function getMatchEvents(matchId) {
     try {
         const response = await footballApi.get('/fixtures', {
             params: {
@@ -112,7 +110,7 @@ export async function getMatchDetails(matchId) {
         });
         return response.data.response[0]?.events;
     } catch (error) {
-        console.error("Erreur lors de la récupération des details du matchs :", error);
+        console.error("[ERROR] Impossible to get match detail", error);
         return [];
     }
 }
