@@ -3,7 +3,7 @@ import 'dotenv/config';
 
 const uri = process.env.MONGO_DB_URI;
 if (!uri) {
-    throw new Error('La variable d\'environnement MONGO_DB_URI est manquante');
+    throw new Error('ENV variable MONGO_DB_URI must be set');
 }
 
 const client = new MongoClient(uri,{
@@ -20,10 +20,10 @@ export async function connectDB(){
     try {
         await client.connect();
         db = client.db("footballinfo");
-        console.log("Connecté avec succès à MongoDB");
+        console.log("[SUCCESS] MongoDB connect successfully");
         return db;
     }catch (error){
-        console.error("Impossible de se connecter à MongoDB",error);
+        console.error("[ERROR] MongoDB connection error:", error);
         process.exit(1);
     }
 }
