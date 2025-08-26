@@ -4,6 +4,7 @@ import {createMatchField} from "../utils/embedHelper.js";
 import {EmbedBuilder} from "discord.js";
 import {chunkArray, getDateRange} from "../utils/util.js";
 import LEAGUE_MAP from "../data/league.js";
+import {addMatchesLeague} from "../data/matches.js";
 
 async function getMatches(uniqueLeagues, from, to) {
     const matchesByLeagues = new Map();
@@ -28,6 +29,20 @@ function createLeagueEmbed(leagueName, matchChunk) {
         createMatchField(embed, match);
     }
     return embed;
+}
+
+export async function fetchDailyMatchesByLeague(){
+    const date = new Date().toISOString().split('T')[0];
+    const servers = await getAllServerConfig();
+    const uniqueLeagues = new Set(servers.flatMap(s => s.leagues || []));
+    if (uniqueLeagues.size === 0) return;
+    const matches =  await getMatches(uniqueLeagues, date, date);
+    for (const [leagueId, leagueMatches] of matches) {
+        console.log(`🏆 League: ${LEAGUE_MAP.get(leagueId)} - Matches today: ${leagueMatches.length}`);
+        if (leagueMatches.length === 0) continue;
+        addMatchesLeague(leagueId, matches.get(leagueId));
+        console.log('✅ Matches added to the database');
+    }
 }
 
 export async function postWeeklyOverviews(client) {

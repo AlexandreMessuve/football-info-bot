@@ -1,5 +1,10 @@
-import {postWeeklyOverviews, updateAllScores} from "../tasks/scheduledTasks.js";
+import {
+    fetchDailyMatchesByLeague,
+    postWeeklyOverviews,
+    updateAllScores
+} from "../tasks/scheduledTasks.js";
 import * as cron from "node-cron";
+import {getMatches} from "../data/matches.js";
 
 export default async (client) => {
     await client.user.setPresence({
@@ -12,11 +17,28 @@ export default async (client) => {
     }, {
         timezone: "Europe/Paris"
     });
-    setInterval(() => {
-        const hoursNow = new Date().getHours() + 1;
-        if(hoursNow >= 12 && hoursNow <= 23){
+    await fetchDailyMatchesByLeague();
+
+    cron.schedule('5 0 * * *', fetchDailyMatchesByLeague, {
+        timezone: "Europe/Paris"
+    });
+    cron.schedule('* * * * *',() => {
+            const matches = getMatches().flat();
+            if (matches && matches.length === 0) {
+                return;
+            }
+            const now = Math.floor(new Date().getTime() / 1000);
+            const twoHoursInSeconds = 2 * 60 * 60;
+            const isAnyMatchLive = matches.some(m => {
+                const startTime = m.date;
+                const endTime = m.date + twoHoursInSeconds;
+                return now >= startTime && now <= endTime;
+            });
+        if (isAnyMatchLive) {
             console.log('🔄️ Verify and update matches...');
             updateAllScores(client);
+        }else{
+            console.log('⏳ No live matches at the moment.');
         }
-    }, (1000 * 60 * 5));
+    });
 }
