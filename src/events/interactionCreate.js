@@ -18,6 +18,7 @@ export default async(interaction) => {
                 return interaction.editReply({ content: i18next.t('noPermission'),flags: [MessageFlags.Ephemeral]});
             }
             try {
+                if (commandName === '')
                 await command.execute(interaction);
             } catch (err) {
                 console.error(err);
