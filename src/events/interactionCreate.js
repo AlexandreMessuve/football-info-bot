@@ -1,6 +1,9 @@
 import {MessageFlags} from "discord.js";
 import i18next from "i18next";
 import {getChoice} from "../utils/util.js";
+import LEAGUE_MAP from "../data/league.js";
+import {getServerConfig, removeLeagueDb} from "../db/serverConfig.js";
+import {deleteLeagueMessage} from "../utils/match.js";
 
 export default async(interaction) => {
         const commandName = interaction.commandName;
@@ -18,8 +21,21 @@ export default async(interaction) => {
                 return interaction.editReply({ content: i18next.t('noPermission'),flags: [MessageFlags.Ephemeral]});
             }
             try {
-                if (commandName === '')
-                await command.execute(interaction);
+                if (commandName === 'add-league' || commandName === 'remove-league') {
+                    const leagueId = interaction.options.getString('league');
+                    const leagueName = LEAGUE_MAP.get(leagueId);
+                    const guild = interaction.member.guild;
+                    await interaction.deferReply({flags: [MessageFlags.Ephemeral]});
+                    if (!leagueName) {
+                        await interaction.editReply({
+                            content: i18next.t('invalidLeagueID', {leagueId})
+                        });
+                        return;
+                    }
+                    await command.execute(leagueId, leagueName, guild, interaction);
+                }else{
+                    await command.execute(interaction);
+                }
             } catch (err) {
                 console.error(err);
                 await interaction.editReply({content: i18next.t('errorMessage'), flags: [MessageFlags.Ephemeral]});

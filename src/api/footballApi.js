@@ -47,28 +47,31 @@ export async function getWeeklyMatchesByLeague(leagueId, from, to) {
                 id: match.fixture.id,
                 status: match.fixture.status,
                 date: match.fixture.timestamp,
-                league: {
-                    name: match.league.name,
-                    logo: match.league.logo,
-                },
+                league: match.league,
                 homeTeam: {
                     name: match.teams.home.name,
                     score: match.goals.home ?? 0,
+                    penalty: match.score.penalty.home ?? 0,
+                    winner: match.teams.home.winner,
                     events: []
                 },
                 awayTeam: {
                     name: match.teams.away.name,
                     score: match.goals.away ?? 0,
+                    penalty: match.score.penalty.away ?? 0,
+                    winner: match.teams.away.winner,
                     events: [],
                 },
             };
             if (matchEvents && matchEvents.length > 0) {
-                matchEvents.filter(event => ['Goal', 'Card'].includes(event.type) && event.detail !== 'Missed Penalty').forEach(event => {
+                matchEvents.filter(event => ['Goal', 'Card'].includes(event.type)).forEach(event => {
+                    const type = event.type === 'Card' ? (event.detail === 'Yellow Card' ? '🟨 ' : '🟥 ') : (event.detail === 'Missed Penalty' ? '❌' : '⚽');
+                    const detail = event.detail === 'Penalty' ? '(PEN)' : (event.detail === 'Own Goal' ? '(OG)' : '');
                     const simpleEvent = {
-                        minute: event.time.elapsed + '"',
+                        minute: event.time.elapsed  + (event.time.extra ? '+' + event.time.extra : '') +'\'',
                         player: event.player.name,
-                        type: event.type === 'Card' ? (event.detail === 'Yellow Card' ? '🟨 ' : '🟥 ') : `⚽ ${event.detail === 'Penalty' ? '(pen)' : ''}`,
-                        detail: event.detail
+                        type: type,
+                        detail: event.type === 'Goal' ? detail : '',
                     };
 
                     if (event.team.id === match.teams.home.id) {
@@ -103,12 +106,12 @@ export async function getStandingsByLeague(leagueId) {
 
 export async function getMatchEvents(matchId) {
     try {
-        const response = await footballApi.get('/fixtures', {
+        const response = await footballApi.get('/fixtures/events', {
             params: {
-                id: matchId,
+                fixture: matchId,
             }
         });
-        return response.data.response[0]?.events;
+        return response.data.response;
     } catch (error) {
         console.error("[ERROR] Impossible to get match detail", error);
         return [];
