@@ -8,11 +8,11 @@ export function createMatchField(embed, match) {
     const matchTime = `<t:${timeStampDateMatch}:F> (<t:${timeStampDateMatch}:R>)`;
     const homeEventsString = match.homeTeam.events
         .map(event => `${event.type} ${event.player} ${event.minute}'`)
-        .join('\n') || ''; // '\u200B' est un espace vide pour éviter un champ vide
+        .join('\n\n') || ''; // '\u200B' est un espace vide pour éviter un champ vide
 
     const awayEventsString = match.awayTeam.events
         .map(event => `${event.type} ${event.player} ${event.minute}'`)
-        .join('\n') || '';
+        .join('\n\n') || '';
 
     let statusText;
     const statusShort = match.status.short;
@@ -27,24 +27,36 @@ export function createMatchField(embed, match) {
     }
 
     const scoreOrVs = ['NS', 'TBD', 'PST', 'CANC', 'ABD', 'AWD'].includes(statusShort) ? 'VS' : `${match.homeTeam.score} - ${match.awayTeam.score}`;
+    let penalty = '';
+    let homePenaltyScore = '\n\n';
+    let awayPenaltyScore = '\n\n';
+    const isDraw = !match.homeTeam.winner && !match.awayTeam.winner;
+    const homeWin = (match.homeTeam.winner ? ' ✅ ' : isDraw ? '' : ' ❌ ') ;
+    const awayWin = (match.awayTeam.winner ? ' ✅ ' : isDraw ? '' : ' ❌ ');
+
+    if (match.status.short === 'PEN') {
+        penalty = `\n\nPEN\n ${match.homeTeam.penalty} - ${match.awayTeam.penalty}`;
+        homePenaltyScore = '\n\n' + ':soccer:'.repeat(match.homeTeam.penalty) + '\n\n';
+        awayPenaltyScore = '\n\n' + ':soccer:'.repeat(match.homeTeam.penalty) + '\n\n';
+    }
     embed.addFields(
         {
             name: '⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯',
             value: statusText,
         },
         {
-            name: match.homeTeam.name,
-            value: homeEventsString,
+            name: '\n',
+            value: `${match.homeTeam.name}${homeWin}${homePenaltyScore}${homeEventsString}`,
             inline: true
         },
         {
-            name: scoreOrVs,
-            value: '',
+            name: '\n',
+            value: `**${scoreOrVs}** ${penalty}`,
             inline: true
         },
         {
-            name: match.awayTeam.name,
-            value: awayEventsString,
+            name: '\n',
+            value: `${match.awayTeam.name}${awayWin}${awayPenaltyScore}${awayEventsString}`,
             inline: true
         },
 

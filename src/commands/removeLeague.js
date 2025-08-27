@@ -17,18 +17,7 @@ export default {
                 .setAutocomplete(true)
         ),
 
-    async execute(interaction) {
-        const leagueId = await interaction.options.getString("league");
-        const leagueName = LEAGUE_MAP.get(leagueId);
-        const guild = await interaction.member.guild;
-        await interaction.deferReply({flags: [MessageFlags.Ephemeral]});
-
-        if (!leagueName) {
-            await interaction.editReply({
-                content: i18next.t('invalidLeagueID', {leagueId})
-            });
-            return;
-        }
+    async execute(leagueId, leagueName, guild, interaction) {
         const server = await getServerConfig(guild.id);
         if (server.leagues && server.leagues.some(l => l.id === leagueId)) {
             try {

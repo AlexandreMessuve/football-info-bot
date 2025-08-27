@@ -1,5 +1,4 @@
 import {MessageFlags, SlashCommandBuilder} from "discord.js";
-import LEAGUE_MAP from "../data/league.js";
 import i18next from "i18next";
 import {addLeague, getServerConfig} from "../db/serverConfig.js";
 import {postLeagueMessage} from "../utils/match.js";
@@ -17,18 +16,7 @@ export default {
                 .setAutocomplete(true)
         ),
 
-    async execute(interaction) {
-        const leagueId = await interaction.options.getString("league");
-        const leagueName = LEAGUE_MAP.get(leagueId);
-        const guild = await interaction.member.guild;
-        await interaction.deferReply({flags: [MessageFlags.Ephemeral]});
-
-        if (!leagueName) {
-            await interaction.editReply({
-                content: i18next.t('invalidLeagueID', {leagueId})
-            });
-            return;
-        }
+    async execute(leagueId, leagueName,guild, interaction) {
         const server = await getServerConfig(guild.id);
         if (server.leagues && server.leagues.some(l => l.id === leagueId)) {
             await interaction.editReply({

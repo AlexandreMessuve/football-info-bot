@@ -22,22 +22,22 @@ export default async (client) => {
     cron.schedule('5 0 * * *', fetchDailyMatchesByLeague, {
         timezone: "Europe/Paris"
     });
-    cron.schedule('* * * * *',() => {
-            const matches = getMatches().flat();
-            if (matches && matches.length === 0) {
-                return;
-            }
-            const now = Math.floor(new Date().getTime() / 1000);
-            const twoHoursInSeconds = 2 * 60 * 60;
-            const isAnyMatchLive = matches.some(m => {
-                const startTime = m.date;
-                const endTime = m.date + twoHoursInSeconds;
-                return now >= startTime && now <= endTime;
-            });
+    cron.schedule('* * * * *', () => {
+        const matches = getMatches().flat();
+        if (matches && matches.length === 0) {
+            return;
+        }
+        const now = Math.floor(new Date().getTime() / 1000);
+        const twoHoursInSeconds = 2 * 60 * 60;
+        const isAnyMatchLive = matches.some(m => {
+            const startTime = m.date;
+            const endTime = m.date + twoHoursInSeconds;
+            return now >= startTime && now <= endTime;
+        });
         if (isAnyMatchLive) {
             console.log('🔄️ Verify and update matches...');
             updateAllScores(client);
-        }else{
+        } else {
             console.log('⏳ No live matches at the moment.');
         }
     });
