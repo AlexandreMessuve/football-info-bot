@@ -19,7 +19,7 @@ let db;
 export async function connectDB(){
     try {
         await client.connect();
-        db = client.db("footballinfo");
+        db = client.db('footballinfo');
         console.log("[SUCCESS] MongoDB connect successfully");
         return db;
     }catch (error){

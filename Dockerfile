@@ -1,6 +1,6 @@
 FROM node:alpine
 LABEL authors="zal"
-LABEL description="A simple Dockerfile to run a Node.js application in a lightweight Alpine Linux container."
+LABEL description="Bot discord for football info matches and more"
 WORKDIR /app
 COPY package*.json ./
 RUN npm install --production

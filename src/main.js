@@ -41,7 +41,7 @@ for (const handler of handlers) {
         console.log("[INFO] Database connected");
 
         console.log("[INFO] Logging in...");
-        await client.login(process.env.TOKEN);
+        await client.login(process.env.DISCORD_TOKEN);
         console.log("[INFO] Bot logged in");
     } catch (error) {
         console.error("[ERROR] Bot failed to start", error);
