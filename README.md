@@ -12,8 +12,16 @@ MongoDB: Used for storing user preferences and settings.
 Discord.js: Library for interacting with the Discord API.
 api-football.com API: Source for football data.
 Node.js: Runtime environment for executing the bot.
+## Requirements
+- Node.js v14 or higher
+- A Discord bot token
+- A MongoDB database
+- An API key from api-football.com
 ## Setup Instructions
 1. Clone the repository:
+    ```bash
+   git clone https://github.com/AlexandreMessuve/football-info-bot.git
+    ```
 2. Install dependencies:
    ```bash
    npm install
