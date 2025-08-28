@@ -10,7 +10,7 @@ import 'dotenv/config';
 export async function setServerChannel(guildId, channelId) {
 
     try {
-            const serverCollection = db.collection('match');
+            const serverCollection = db.collection('servers');
             return await serverCollection.updateOne(
                 {guildId},
                 {$set: {
@@ -34,7 +34,7 @@ export async function setServerChannel(guildId, channelId) {
  * @returns {Promise<*>}
  */
 export async function addLeague(guildId, leagueId, leagueName) {
-    const serverCollection = db.collection('match');
+    const serverCollection = db.collection('servers');
     return await serverCollection.updateOne(
         {guildId},
         {
@@ -57,7 +57,7 @@ export async function addLeague(guildId, leagueId, leagueName) {
  * @returns {Promise<*>}
  */
 export async function removeLeagueDb(guildId, leagueId) {
-    const serverCollection = db.collection('match');
+    const serverCollection = db.collection('servers');
     return await serverCollection.updateOne(
         {guildId},
         {
@@ -79,7 +79,7 @@ export async function removeLeagueDb(guildId, leagueId) {
  * @returns {Promise<*>}
  */
 export async function setMessageId(guildId, leagueId, messageId, dateRange) {
-    const serverCollection = db.collection('match');
+    const serverCollection = db.collection('servers');
     return await serverCollection.updateOne(
         {guildId},
         {$addToSet: {[`messages.${dateRange}.${leagueId}`]: [messageId]}},
@@ -95,7 +95,7 @@ export async function setMessageId(guildId, leagueId, messageId, dateRange) {
  * @returns {Promise<*>}
  */
 export async function removeMessageId(guildId, leagueId, dateRange) {
-    const serverCollection = db.collection('match');
+    const serverCollection = db.collection('servers');
     return await serverCollection.updateOne(
         {guildId},
         {$unset: { [`messages.${dateRange}.${leagueId}`] : "" }},
@@ -108,12 +108,12 @@ export async function removeMessageId(guildId, leagueId, dateRange) {
  * @returns {Promise<*>}
  */
 export async function getAllServerConfig() {
-    const serverCollection = db.collection('match');
+    const serverCollection = db.collection('servers');
     return await serverCollection.find({}).toArray();
 }
 
 export async function getServerConfig(guildId) {
-    const serverCollection = db.collection('match');
+    const serverCollection = db.collection('servers');
     return await serverCollection.findOne({guildId}) || null;
 }
 

@@ -28,7 +28,7 @@ export default async (client) => {
             return;
         }
         const now = Math.floor(new Date().getTime() / 1000);
-        const twoHoursInSeconds = 2 * 60 * 60;
+        const twoHoursInSeconds = 2.35 * 60 * 60; // 2 hours
         const isAnyMatchLive = matches.some(m => {
             const startTime = m.date;
             const endTime = m.date + twoHoursInSeconds;

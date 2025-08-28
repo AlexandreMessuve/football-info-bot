@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  football-info-bot:
+    build: .
+    container_name: football-bot
+    restart: always
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+      - DISCORD_CLIENT_ID=${DISCORD_CLIENT_ID}
+      - MONGO_DB_URI=${MONGO_DB_URI}
+      - FOOTBALL_API_KEY=${FOOTBALL_API_KEY}
+      - FOOTBALL_API_BASE_URL=${FOOTBALL_API_BASE_URL}
