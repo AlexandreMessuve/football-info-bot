@@ -2,6 +2,7 @@ import {MessageFlags, SlashCommandBuilder} from "discord.js";
 import i18next from "i18next";
 import {addLeague, getServerConfig} from "../db/serverConfig.js";
 import {postLeagueMessage} from "../utils/match.js";
+import {fetchDailyMatchesByLeague} from "../tasks/scheduledTasks.js";
 
 export default {
     data: new SlashCommandBuilder()
@@ -27,7 +28,8 @@ export default {
         try {
             await Promise.all([
                 addLeague(guild.id, leagueId, leagueName),
-                postLeagueMessage(guild, leagueId)
+                postLeagueMessage(guild, leagueId),
+                fetchDailyMatchesByLeague()
             ]);
             await interaction.editReply(i18next.t('addLeagueSuccess', {leagueName}));
         } catch (e) {
