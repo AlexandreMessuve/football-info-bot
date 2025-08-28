@@ -71,3 +71,12 @@ export function createMatchField(embed, match) {
 
   return embed;
 }
+
+/**
+ * Create a standings league field for a Discord embed.
+ * @param embed
+ * @param standings
+ */
+export function createStandingsField(embed, standings){
+
+}

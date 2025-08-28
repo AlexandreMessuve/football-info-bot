@@ -130,7 +130,35 @@ export async function getStandingsByLeague(leagueId) {
         season: new Date().getFullYear(),
       },
     });
-    return response.data.response;
+    const res = response.data.response[0];
+    if (res.length === 0) return [];
+    const league =  {
+        id: res.league.id,
+        name: res.league.name,
+        standings: []
+    };
+    if (res.league.standings[0].length > 0){
+        let standings = res.league.standings[0];
+        standings = standings.map((team) => {
+            return {
+                team: {
+                    name: team.team.name,
+                    rank: team.rank,
+                    points: team.points,
+                    form: team.form.split('').map(f => f === 'W' ? ' ✅ ' : f === 'D' ? ' ➖ ' : ' ❌ ').join(' '),
+                    played: team.all.played,
+                    win: team.all.win,
+                    draw: team.all.draw,
+                    lose: team.all.lose,
+                    goalsFor: team.all.goals.for,
+                    goalsAgainst: team.all.goals.against,
+                    goalsDiff: team.goalsDiff,
+                }
+            }
+        })
+        league.standings = standings;
+    }
+    return league;
   } catch (error) {
     console.error('[ERROR] Impossible to get standings', error);
     return [];

@@ -9,14 +9,21 @@ export default {
   data: new SlashCommandBuilder()
     .setName('configure')
     .setDescription('Configure the bot for this server')
-    .setDescriptionLocalization('fr', 'Configuration du bot pour ce serveur')
+    .setDescriptionLocalizations(
+        {
+            'fr': 'Configuration du bot pour ce serveur',
+            'es-ES': 'Configurar el bot para este servidor'
+        }
+    )
     .addChannelOption((option) =>
       option
         .setName('match_channel')
         .setDescription('The channel for matches announcements')
-        .setDescriptionLocalization(
-          'fr',
-          'Le canal pour les annonces de matchs'
+        .setDescriptionLocalizations(
+            {
+                'fr': 'Le canal pour les annonces de matchs',
+                'es-ES': 'El canal para los anuncios de partidos'
+            }
         )
         .addChannelTypes(ChannelType.GuildText)
         .setRequired(true)
@@ -24,7 +31,7 @@ export default {
 
   async execute(interaction) {
     const guildId = interaction.guildId;
-    const channel = await interaction.options.getChannel('channel');
+    const channel = await interaction.options.getChannel('match_channel');
     await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
     try {
       await setServerChannel(guildId, channel.id);

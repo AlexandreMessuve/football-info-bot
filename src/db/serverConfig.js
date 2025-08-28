@@ -41,12 +41,35 @@ export async function addLeague(guildId, leagueId, leagueName) {
       $addToSet: {
         ['leagues']: {
           id: leagueId,
-          name: leagueName,
+          name: leagueName
         },
       },
     },
     { upsert: true }
   );
+}
+
+/**
+ * Adds a league to the specified guild in the database.
+ * @param guildId
+ * @param leagueId
+ * @param standingMessageId
+ * @returns {Promise<*>}
+ */
+export async function addStanding(guildId, leagueId, standingMessageId) {
+    const serverCollection = db.collection('servers');
+    return await serverCollection.updateOne(
+        { guildId },
+        {
+            $addToSet: {
+                ['standings']: {
+                    id: leagueId,
+                    channelId: standingMessageId
+                },
+            },
+        },
+        { upsert: true }
+    );
 }
 
 /**
