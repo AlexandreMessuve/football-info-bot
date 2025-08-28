@@ -2,9 +2,12 @@ import {MessageFlags} from "discord.js";
 import i18next from "i18next";
 import {getChoice} from "../utils/util.js";
 import LEAGUE_MAP from "../data/league.js";
-import {getServerConfig, removeLeagueDb} from "../db/serverConfig.js";
-import {deleteLeagueMessage} from "../utils/match.js";
 
+/**
+ * Handle interaction create event
+ * @param interaction
+ * @returns {Promise<*>}
+ */
 export default async(interaction) => {
         const commandName = interaction.commandName;
         const command = interaction.client.commands.get(commandName);

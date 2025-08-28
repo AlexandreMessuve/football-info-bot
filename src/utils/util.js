@@ -3,6 +3,12 @@ import LEAGUE_MAP from "../data/league.js";
 import {getServerConfig} from "../db/serverConfig.js";
 export const delay = ms => new Promise(res => setTimeout(res, ms));
 
+/**
+ * Get choices for adding or removing leagues based on server configuration
+ * @param guildId
+ * @param type
+ * @returns {Promise<{name: *, value: *}[]|*[]>}
+ */
 export async function getChoice(guildId, type) {
     const server = await getServerConfig(guildId);
     const configuredLeagues = new Set((server.leagues || []).map(l => l.id));
@@ -23,6 +29,10 @@ export async function getChoice(guildId, type) {
     }) );
 }
 
+/**
+ * Get the date range for the current week (Monday to Sunday)
+ * @returns {{dateFrom: string, dateTo: string}}
+ */
 export function getDateRange(){
     const today = new Date();
     const monday = startOfWeek(today, { weekStartsOn: 1 });
@@ -36,10 +46,10 @@ export function getDateRange(){
 }
 
 /**
- * Divise un tableau en plusieurs sous-tableaux d'une taille maximale donnée.
- * @param {Array} array - Le tableau à diviser.
- * @param {number} chunkSize - La taille maximale de chaque sous-tableau.
- * @returns {Array<Array>} - Un tableau de sous-tableaux.
+ * Chunk an array into smaller arrays of a specified size
+ * @param {Array} array  // The array to be chunked
+ * @param {number} chunkSize // The size of each chunk
+ * @returns {Array<Array>} // An array of chunked arrays
  */
 export function chunkArray(array, chunkSize) {
     const chunks = [];

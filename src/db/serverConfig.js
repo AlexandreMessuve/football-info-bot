@@ -2,7 +2,7 @@ import {db} from "./mongoConfig.js";
 import 'dotenv/config';
 
 /**
- *
+ * Sets the channel for a specific guild in the database.
  * @param guildId
  * @param channelId
  * @returns {Promise<*>}
@@ -27,7 +27,7 @@ export async function setServerChannel(guildId, channelId) {
 }
 
 /**
- *
+ * Adds a league to the specified guild in the database.
  * @param guildId
  * @param leagueId
  * @param leagueName
@@ -51,7 +51,7 @@ export async function addLeague(guildId, leagueId, leagueName) {
 }
 
 /**
- *
+ * Removes a league from the specified guild in the database.
  * @param guildId
  * @param leagueId
  * @returns {Promise<*>}
@@ -71,7 +71,7 @@ export async function removeLeagueDb(guildId, leagueId) {
 }
 
 /**
- *
+ * Sets a message ID for a specific league and date range in the database.
  * @param guildId
  * @param leagueId
  * @param messageId
@@ -88,7 +88,7 @@ export async function setMessageId(guildId, leagueId, messageId, dateRange) {
 }
 
 /**
- *
+ * Removes a message ID for a specific league and date range in the database.
  * @param guildId
  * @param leagueId
  * @param dateRange
@@ -104,7 +104,7 @@ export async function removeMessageId(guildId, leagueId, dateRange) {
 }
 
 /**
- *
+ * Retrieves all server configurations from the database.
  * @returns {Promise<*>}
  */
 export async function getAllServerConfig() {
@@ -112,6 +112,11 @@ export async function getAllServerConfig() {
     return await serverCollection.find({}).toArray();
 }
 
+/**
+ * Retrieves the server configuration for a specific guild from the database.
+ * @param guildId
+ * @returns {Promise<*|null>}
+ */
 export async function getServerConfig(guildId) {
     const serverCollection = db.collection('servers');
     return await serverCollection.findOne({guildId}) || null;

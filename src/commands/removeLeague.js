@@ -3,7 +3,11 @@ import LEAGUE_MAP from "../data/league.js";
 import i18next from "i18next";
 import {getServerConfig, removeLeagueDb} from "../db/serverConfig.js";
 import {deleteLeagueMessage} from "../utils/match.js";
+import {fetchDailyMatchesByLeague} from "../tasks/scheduledTasks.js";
 
+/**
+ * Remove a league from the server's configuration and delete associated messages.
+ */
 export default {
     data: new SlashCommandBuilder()
         .setName("remove-league")
@@ -21,8 +25,11 @@ export default {
         const server = await getServerConfig(guild.id);
         if (server.leagues && server.leagues.some(l => l.id === leagueId)) {
             try {
-                await deleteLeagueMessage(guild, leagueId);
-                await removeLeagueDb(guild.id, leagueId);
+                await Promise.all([
+                    deleteLeagueMessage(guild, leagueId),
+                    removeLeagueDb(guild.id, leagueId),
+                    fetchDailyMatchesByLeague()
+                ]);
                 await interaction.editReply(i18next.t('removeLeagueSuccess', {leagueName}));
             } catch (e) {
                 await interaction.editReply({

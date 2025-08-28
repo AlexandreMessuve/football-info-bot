@@ -6,6 +6,13 @@ import {chunkArray, getDateRange} from "../utils/util.js";
 import LEAGUE_MAP from "../data/league.js";
 import {addMatchesLeague} from "../data/matches.js";
 
+/**
+ * retrieve matches for a set of leagues within a date range.
+ * @param uniqueLeagues
+ * @param from
+ * @param to
+ * @returns {Promise<Map<any, any>>}
+ */
 async function getMatches(uniqueLeagues, from, to) {
     const matchesByLeagues = new Map();
     for (const c of uniqueLeagues) {
@@ -17,7 +24,12 @@ async function getMatches(uniqueLeagues, from, to) {
     return matchesByLeagues;
 }
 
-
+/**
+ * Create an embed for a league with a chunk of matches.
+ * @param leagueName
+ * @param matchChunk
+ * @returns {EmbedBuilder}
+ */
 function createLeagueEmbed(leagueName, matchChunk) {
     const embed = new EmbedBuilder()
         .setColor('#0099ff')
@@ -31,6 +43,10 @@ function createLeagueEmbed(leagueName, matchChunk) {
     return embed;
 }
 
+/**
+ * Fetch daily matches for all leagues configured in servers and store them in the database.
+ * @returns {Promise<void>}
+ */
 export async function fetchDailyMatchesByLeague(){
     const date = new Date().toISOString().split('T')[0];
     const servers = await getAllServerConfig();
@@ -45,6 +61,11 @@ export async function fetchDailyMatchesByLeague(){
     }
 }
 
+/**
+ * Post weekly overviews to the configured channels in each server.
+ * @param client
+ * @returns {Promise<void>}
+ */
 export async function postWeeklyOverviews(client) {
     const servers = await getAllServerConfig();
     const uniqueLeagues = new Set(servers.flatMap(s => s.leagues || []));
@@ -78,6 +99,11 @@ export async function postWeeklyOverviews(client) {
 }
 
 
+/**
+ * Update all scores in the messages previously sent for the current week.
+ * @param client
+ * @returns {Promise<void>}
+ */
 export async function updateAllScores(client) {
     const servers = await getAllServerConfig();
     const uniqueLeagues = new Set(servers.flatMap(s => s.leagues || []));

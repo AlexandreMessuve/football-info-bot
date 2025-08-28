@@ -6,7 +6,7 @@ import FsBackend from "i18next-fs-backend";
 import path from "path";
 const __filename = new URL('', import.meta.url).pathname;
 const __dirname = path.join(__filename, '..');
-
+// Initialize i18next with filesystem backend
 const localesPath = path.join(__dirname,'..', 'locales', '{{lng}}.json');
 await i18next.use(FsBackend).init({
     fallbackLng: 'en',
@@ -15,6 +15,7 @@ await i18next.use(FsBackend).init({
         loadPath: localesPath,
     },
 });
+// Create a new client instance
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -25,6 +26,7 @@ client.commands = new Collection();
 
 const handlers = ['events', 'commands', 'errors'];
 
+// Dynamically import and execute each handler
 for (const handler of handlers) {
     const handlerImport = await import(`./handlers/${handler}.js`);
     const handlerFunction = handlerImport.default;
@@ -34,6 +36,9 @@ for (const handler of handlers) {
         console.error(`[ERROR]: Invalid handler function in ./handlers/${handler}`);
     }
 }
+/**
+ * * Login to Discord with your client's token
+ */
 (async() =>{
     try {
         console.log("[INFO] Connecting to database...");

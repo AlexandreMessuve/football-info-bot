@@ -2,7 +2,14 @@ import {MessageFlags, SlashCommandBuilder} from "discord.js";
 import i18next from "i18next";
 import {addLeague, getServerConfig} from "../db/serverConfig.js";
 import {postLeagueMessage} from "../utils/match.js";
+import {fetchDailyMatchesByLeague} from "../tasks/scheduledTasks.js";
 
+/**
+ * Command to add a new league to the system.
+ * This command allows users to add a league by specifying its name.
+ * It checks if the league already exists in the server configuration before adding it.
+ * Upon successful addition, it posts a message about the league and fetches daily matches.
+ */
 export default {
     data: new SlashCommandBuilder()
         .setName("add-league")
@@ -27,7 +34,8 @@ export default {
         try {
             await Promise.all([
                 addLeague(guild.id, leagueId, leagueName),
-                postLeagueMessage(guild, leagueId)
+                postLeagueMessage(guild, leagueId),
+                fetchDailyMatchesByLeague()
             ]);
             await interaction.editReply(i18next.t('addLeagueSuccess', {leagueName}));
         } catch (e) {

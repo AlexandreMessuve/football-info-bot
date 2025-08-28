@@ -1,5 +1,5 @@
 /**
- *
+ * Create a match field for a Discord embed.
  * @param embed
  * @param match
  */
