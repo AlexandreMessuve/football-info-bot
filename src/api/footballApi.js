@@ -12,6 +12,13 @@ const footballApi = axios.create({
    }
 });
 
+/**
+ * Get weekly matches by league
+ * @param leagueId
+ * @param from
+ * @param to
+ * @returns {Promise<*|*[]>}
+ */
 export async function getWeeklyMatchesByLeague(leagueId, from, to) {
     try {
         const response = await footballApi.get('/fixtures', {
@@ -89,6 +96,11 @@ export async function getWeeklyMatchesByLeague(leagueId, from, to) {
     }
 }
 
+/**
+ * Get standings by league
+ * @param leagueId
+ * @returns {Promise<*|*[]>}
+ */
 export async function getStandingsByLeague(leagueId) {
     try {
         const response = await footballApi.get('/standings', {
@@ -104,6 +116,11 @@ export async function getStandingsByLeague(leagueId) {
     }
 }
 
+/**
+ * Get match events by match id
+ * @param matchId
+ * @returns {Promise<*|*[]>}
+ */
 export async function getMatchEvents(matchId) {
     try {
         const response = await footballApi.get('/fixtures/events', {

@@ -6,6 +6,11 @@ import {
 import * as cron from "node-cron";
 import {getMatches} from "../data/matches.js";
 
+/**
+ * Event triggered when the bot is ready
+ * @param client
+ * @returns {Promise<void>}
+ */
 export default async (client) => {
     await client.user.setPresence({
         status: 'online'
@@ -25,6 +30,7 @@ export default async (client) => {
     cron.schedule('* * * * *', () => {
         const matches = getMatches().flat();
         if (matches && matches.length === 0) {
+            console.log('⏳ No match today.');
             return;
         }
         const now = Math.floor(new Date().getTime() / 1000);

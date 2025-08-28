@@ -5,6 +5,9 @@ import {getServerConfig, removeLeagueDb} from "../db/serverConfig.js";
 import {deleteLeagueMessage} from "../utils/match.js";
 import {fetchDailyMatchesByLeague} from "../tasks/scheduledTasks.js";
 
+/**
+ * Remove a league from the server's configuration and delete associated messages.
+ */
 export default {
     data: new SlashCommandBuilder()
         .setName("remove-league")

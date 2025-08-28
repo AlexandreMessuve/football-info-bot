@@ -3,6 +3,12 @@ import fs from 'fs/promises';
 import { REST, Routes} from 'discord.js';
 const __filename = new URL('', import.meta.url).pathname;
 const __dirname = path.join(__filename, '..');
+
+/**
+ * Registers commands for the Discord bot.
+ * @param client
+ * @returns {Promise<void>}
+ */
 export default async(client) => {
     const commands = [];
     const foldersPath = path.join(__dirname, '../commands');

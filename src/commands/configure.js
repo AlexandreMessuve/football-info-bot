@@ -2,6 +2,9 @@ import {MessageFlags, SlashCommandBuilder} from "discord.js";
 import i18next from "i18next";
 import {setServerChannel} from "../db/serverConfig.js";
 
+/**
+ * Configure the bot for this server
+ */
 export default {
     data: new SlashCommandBuilder()
         .setName("configure")

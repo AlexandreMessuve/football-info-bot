@@ -16,6 +16,10 @@ const client = new MongoClient(uri,{
 
 let db;
 
+/**
+ * Connect to MongoDB and return the database instance.
+ * @returns {Promise<Db>}
+ */
 export async function connectDB(){
     try {
         await client.connect();

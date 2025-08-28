@@ -4,6 +4,12 @@ import {addLeague, getServerConfig} from "../db/serverConfig.js";
 import {postLeagueMessage} from "../utils/match.js";
 import {fetchDailyMatchesByLeague} from "../tasks/scheduledTasks.js";
 
+/**
+ * Command to add a new league to the system.
+ * This command allows users to add a league by specifying its name.
+ * It checks if the league already exists in the server configuration before adding it.
+ * Upon successful addition, it posts a message about the league and fetches daily matches.
+ */
 export default {
     data: new SlashCommandBuilder()
         .setName("add-league")
