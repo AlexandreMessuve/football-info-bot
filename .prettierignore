@@ -1,0 +1,7 @@
+# Fichiers de configuration
+.env
+package-lock.json
+
+# Dossiers
+node_modules
+dist

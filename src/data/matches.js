@@ -6,8 +6,8 @@ const matchesByLeague = new Map();
  * @param matches
  */
 export const addMatchesLeague = (leagueId, matches) => {
-    matchesByLeague.set(leagueId, matches);
-}
+  matchesByLeague.set(leagueId, matches);
+};
 /**
  * Get all matches grouped by league
  * @returns {any[]}
@@ -18,8 +18,8 @@ export const getMatches = () => Array.from(matchesByLeague.values());
  * Clear all matches
  */
 export const clearMatches = () => {
-    matchesByLeague.clear();
-}
+  matchesByLeague.clear();
+};
 
 /**
  * Get matches by league ID

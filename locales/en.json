@@ -1,10 +1,10 @@
 {
-    "errorMessage": "An error occurred while executing this command.",
-    "noPermission": "You do not have permission to use this command.",
-    "invalidLeagueID": "The provided league ID **{{leagueID}}** is invalid.",
-    "configureChannelSuccess": "Channel {{channelName}} has been successfully configured for league updates.",
-    "addLeagueSuccess": "The league **{{leagueName}}** has been successfully added!",
-    "addLeagueAlreadyExists": "The league **{{leagueName}}** is already in your list.",
-    "removeLeagueSuccess": "The league **{{leagueName}}** has been successfully removed!",
-    "removeLeagueNotFound": "The league **{{leagueName}}** was not found in your list."
+  "errorMessage": "An error occurred while executing this command.",
+  "noPermission": "You do not have permission to use this command.",
+  "invalidLeagueID": "The provided league ID **{{leagueID}}** is invalid.",
+  "configureChannelSuccess": "Channel {{channelName}} has been successfully configured for league updates.",
+  "addLeagueSuccess": "The league **{{leagueName}}** has been successfully added!",
+  "addLeagueAlreadyExists": "The league **{{leagueName}}** is already in your list.",
+  "removeLeagueSuccess": "The league **{{leagueName}}** has been successfully removed!",
+  "removeLeagueNotFound": "The league **{{leagueName}}** was not found in your list."
 }
