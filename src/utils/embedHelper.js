@@ -1,3 +1,5 @@
+import i18next from "i18next";
+
 /**
  * Create a match field for a Discord embed.
  * @param embed
@@ -16,16 +18,20 @@ export function createMatchField(embed, match) {
       .map((event) => `${event.type} ${event.player} ${event.minute}'`)
       .join('\n\n') || '';
 
+  const kickOff = i18next.t('kickOff');
+  const finished = i18next.t('finished');
+  const live = i18next.t('live');
+  const halfTime = i18next.t('halfTime');
   let statusText;
   const statusShort = match.status.short;
   if (['1H', '2H', 'ET'].includes(statusShort)) {
-    statusText = `🔴 **En direct** | ${match.status.elapsed}"`;
+    statusText = `🔴 **${live}** | ${match.status.elapsed}"`;
   } else if (['HT'].includes(statusShort)) {
-    statusText = '⏸️ **Mi-temps**';
+    statusText = `⏸️ **${halfTime}**`;
   } else if (['FT', 'AET', 'PEN'].includes(statusShort)) {
-    statusText = `🏁 **Terminé** ${matchTime}`;
+    statusText = `🏁 **${finished}** ${matchTime}`;
   } else {
-    statusText = `▶️ **Coup d'envoi**: ${matchTime}`;
+    statusText = `▶️ **${kickOff}**: ${matchTime}`;
   }
 
   const scoreOrVs = ['NS', 'TBD', 'PST', 'CANC', 'ABD', 'AWD'].includes(
@@ -45,7 +51,7 @@ export function createMatchField(embed, match) {
     homePenaltyScore =
       '\n\n' + ':soccer:'.repeat(match.homeTeam.penalty) + '\n\n';
     awayPenaltyScore =
-      '\n\n' + ':soccer:'.repeat(match.homeTeam.penalty) + '\n\n';
+      '\n\n' + ':soccer:'.repeat(match.awayTeam.penalty) + '\n\n';
   }
   embed.addFields(
     {
@@ -70,13 +76,4 @@ export function createMatchField(embed, match) {
   );
 
   return embed;
-}
-
-/**
- * Create a standings league field for a Discord embed.
- * @param embed
- * @param standings
- */
-export function createStandingsField(embed, standings){
-
 }

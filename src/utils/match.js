@@ -3,11 +3,14 @@ import {
   removeMessageId,
   setMessageId,
 } from '../db/serverConfig.js';
-import { chunkArray, getDateRange } from './util.js';
+import {changeLang, chunkArray, getDateRange} from './util.js';
 import { getWeeklyMatchesByLeague } from '../api/footballApi.js';
 import { EmbedBuilder } from 'discord.js';
 import { createMatchField } from './embedHelper.js';
 import LEAGUE_MAP from '../data/league.js';
+import i18next from "i18next";
+import {createLeagueEmbed} from "../tasks/scheduledTasks.js";
+import {postStandingLeague} from "./standing.js";
 
 /**
  * Finds and deletes a specific league message from a server.
@@ -71,19 +74,11 @@ export async function postLeagueMessage(guild, leagueId) {
     const channel = await guild.channels.fetch(serverConfig.channelId);
     const leagueName = LEAGUE_MAP.get(leagueId);
     const matchesChunk = chunkArray(matches, 6);
+    await changeLang(guild.id)
+    await postStandingLeague(guild, leagueId, serverConfig.channelId)
     for (const matcheChunk of matchesChunk) {
-      let embed = new EmbedBuilder()
-        .setColor('#0099ff')
-        .setTitle(`📅 Programme - ${leagueName}`)
-        .setThumbnail(matcheChunk[0].league.logo)
-        .setTimestamp();
-
-      for (const match of matcheChunk) {
-        embed = createMatchField(embed, match);
-      }
-
+      const embed = createLeagueEmbed(leagueName, matcheChunk);
       const sentMessage = await channel.send({ embeds: [embed] });
-
       // The setMessageId function handles all database logic
       await setMessageId(guild.id, leagueId, sentMessage.id, range);
       console.log(

@@ -2,9 +2,11 @@ import { getAllServerConfig, setMessageId } from '../db/serverConfig.js';
 import { getWeeklyMatchesByLeague } from '../api/footballApi.js';
 import { createMatchField } from '../utils/embedHelper.js';
 import { EmbedBuilder } from 'discord.js';
-import { chunkArray, getDateRange } from '../utils/util.js';
+import {changeLang, chunkArray, getDateRange} from '../utils/util.js';
 import LEAGUE_MAP from '../data/league.js';
 import { addMatchesLeague } from '../data/matches.js';
+import i18next from "i18next";
+import {postStandingLeague} from "../utils/standing.js";
 
 /**
  * retrieve matches for a set of leagues within a date range.
@@ -30,13 +32,13 @@ async function getMatches(uniqueLeagues, from, to) {
  * @param matchChunk
  * @returns {EmbedBuilder}
  */
-function createLeagueEmbed(leagueName, matchChunk) {
+export function createLeagueEmbed(leagueName, matchChunk) {
   const embed = new EmbedBuilder()
     .setColor('#0099ff')
-    .setTitle(`📅 Programme - ${leagueName}`)
+    .setTitle(i18next.t('planning', { leagueName }))
     .setThumbnail(matchChunk[0].league.logo)
+    .setFooter({ text: i18next.t('lastUpdate') } )
     .setTimestamp();
-
   for (const match of matchChunk) {
     createMatchField(embed, match);
   }
@@ -80,14 +82,19 @@ export async function postWeeklyOverviews(client) {
   for (const server of servers) {
     if (!server.channelId || !server.leagues) continue;
     try {
+      await i18next.changeLanguage(server.language);
+      const guild = await client.guilds.fetch(server.guildId);
       const channel = await client.channels.fetch(server.channelId);
       for (const league of server.leagues) {
+
         const leagueMatches = matchesByLeagues.get(league.id);
         if (!leagueMatches) continue;
 
         const leagueName = LEAGUE_MAP.get(league.id);
         const leagueMatchesChunks = chunkArray(leagueMatches, 6);
-
+        if (guild){
+          await postStandingLeague(guild, league.id, server.channelId);
+        }
         for (const matchChunk of leagueMatchesChunks) {
           const embed = createLeagueEmbed(leagueName, matchChunk);
           const sentMessage = await channel.send({ embeds: [embed] });
@@ -125,6 +132,7 @@ export async function updateAllScores(client) {
   for (const server of servers) {
     if (!server.channelId || !server.messages?.[dateRange]) continue;
     try {
+      await i18next.changeLanguage(server.language);
       const channel = await client.channels.fetch(server.channelId);
       if (!channel) continue;
 

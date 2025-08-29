@@ -1,43 +1,131 @@
 import {getStandingsByLeague} from "../api/footballApi.js";
-import {Embed, EmbedBuilder} from "discord.js";
+import {ActionRowBuilder, ButtonBuilder,ButtonStyle , Embed, EmbedBuilder} from "discord.js";
+import i18next from "i18next";
+import {changeLang, getDateRange} from "./util.js";
+import {addStanding, getServerConfig, removeMessageId, removeStandings} from "../db/serverConfig.js";
+import league from "../data/league.js";
+import LEAGUE_MAP from "../data/league.js";
 
-export async function postStandingLeague(guild, leagueId, channelId){
-        const guildId = await guild.id;
-        const channel = await guild.channels.fetch(channelId);
-        const league = await getStandingsByLeague(leagueId);
-        const thread = await channel.threads.cache.find(t => t.name === `standings-${league.name}`) ||
-        await channel.threads.create({
-            name: `standings-${league.name}`,
-            autoArchiveDuration: 60,
-            reason: 'Thread for league standings',
-        });
-        if(league){
-            const standings = league.standings;
-            const embed = new EmbedBuilder()
-                .setTitle(`${league.name} - Classement`)
-                .setColor(0x1F8B4C)
-                .setTimestamp();
-            embed.addFields({
-                    name: 'POS | Pts | J | G | N | P | BP | BC | Diff | Forme | Équipe',
-                    value: '\u200B'
-            });
-            for (const standing of standings) {
-                const team = standing.team.name;
-                const points = standing.team.points;
-                const played = standing.team.played;
-                const wins = standing.team.win;
-                const draws = standing.team.draw;
-                const losses = standing.team.lose;
-                const goalsFor = standing.team.goalsFor;
-                const goalsAgainst = standing.team.goalsAgainst;
-                const goalDifference = standing.team.goalsDiff;
-                console.log(standing)
-                embed.addFields({
-                    name: `${standing.team.rank.toString().padStart(2, ' ')} | ${points.toString().padStart(3, ' ')} | ${played.toString().padStart(1, ' ')} | ${wins.toString().padStart(1, ' ')} | ${draws.toString().padStart(1, ' ')} | ${losses.toString().padStart(1, ' ')} | ${goalsFor.toString().padStart(2, ' ')} | ${goalsAgainst.toString().padStart(2, ' ')} | ${goalDifference.toString().padStart(3, ' ')} | ${standing.team.form} | ${team.padEnd(20, ' ')}`,
-                    value: '\u200B'
-                });
-            }
-            await thread.send({embeds: [embed]});
-            console.log(`Posted standings for league ${league.league.name} in guild ${guild.name}`);
-        }
+
+function createStandingsEmbed(league, standingsTitle) {
+  const standings = league.standings;
+  const embed = new EmbedBuilder()
+    .setTitle(`🏆 ${standingsTitle}`)
+    .setColor(0x1F8B4C)
+    .setFooter({ text: i18next.t('lastUpdate') })
+    .setTimestamp();
+  for (const standing of standings) {
+    const rank = standing.team.rank.toString();
+    const teamName = standing.team.name;
+    const points = standing.team.points.toString();
+    const played = standing.team.played.toString();
+    const win = standing.team.win.toString();
+    const draw = standing.team.draw.toString();
+    const lose = standing.team.lose.toString();
+    const goalsFor = standing.team.goalsFor.toString();
+    const goalsAgainst = standing.team.goalsAgainst.toString();
+    const goalDiff = standing.team.goalsDiff > 0 ? `+${standing.team.goalsDiff}` : standing.team.goalsDiff.toString();
+    const formString = (standing.team.form || ' N/A')
+      .replace(/W/g, '✅').replace(/D/g, '⭕').replace(/L/g, '❌');
+
+    const standingDescription = i18next.t('rowsStanding', {
+      points,
+      played,
+      win,
+      draw,
+      lose,
+      goalsFor,
+      goalsAgainst,
+      goalDiff,
+      formString
+    });
+    embed.addFields({
+      name: `**${rank}**. **${teamName}**`,
+      value: standingDescription
+    });
+  }
+
+  return embed;
+}
+
+export async function postStandingLeague(guild, leagueId, channelId) {
+  const guildId = await guild.id;
+  const channel = await guild.channels.fetch(channelId);
+  const league = await getStandingsByLeague(leagueId);
+  await changeLang(guildId);
+  const server = await getServerConfig(guildId);
+  const standings = server.standings || [];
+  const existing = standings.find(s => s.leagueId === leagueId);
+  let message;
+  let isExisting = false;
+  if (existing){
+    message = await channel.messages.fetch(existing.messageId);
+    if (message) {
+      isExisting = true;
+    }
+  }
+  const standingsTitle = i18next.t('standingsTitle', {
+    leagueName: LEAGUE_MAP.get(leagueId),
+  });
+  const thread = await channel.threads.cache.find(t => t.name === standingsTitle) ||
+    await channel.threads.create({
+      name: standingsTitle,
+      autoArchiveDuration: 10080, // 1 week in minutes (60, 1440, 4320, 10080)
+      type: 11,
+      reason: 'Thread for league standings',
+    });
+  if (league) {
+    const embed = createStandingsEmbed(league, standingsTitle);
+    if (isExisting){
+      await message.edit({embeds: [embed]});
+      console.log(`Updated standings for league ${league.name} in guild ${guild.name}`);
+      return;
+    }else{
+          message =  await thread.send({embeds: [embed]});
+          await addStanding(guildId, leagueId, message.id)
+    }
+    console.log(`Posted standings for league ${league.name} in guild ${guild.name}`);
+  } else {
+    console.log(`No standings found for league ID ${leagueId}`);
+  }
+}
+
+export async function deleteStandingLeague(guild, leagueId) {
+  const serverConfig = await getServerConfig(guild.id);
+
+  if (!serverConfig.channelId) {
+    console.log(
+      `[Delete] No channel or message IDs found for standing league ${leagueId} in server ${guild.name}.`
+    );
+    return;
+  }
+  try {
+    const channel = await guild.channels.fetch(serverConfig.channelId);
+    if (!channel) {
+      console.log(
+        `[Delete] Channel with ID ${serverConfig.channelId} not found in server ${guild.name}.`
+      );
+      return;
+    }
+    await changeLang(guild.id);
+    const standingsTitle = i18next.t('standingsTitle', {
+      leagueName: LEAGUE_MAP.get(leagueId),
+    })
+    const thread = await channel.threads.cache.find(t => t.name === standingsTitle)
+    if (!thread){
+      console.log('[Delete] No thread found for standings.')
+      return
+    }
+    await thread.delete();
+    console.log('[DELETE] Successfully deleted thread.')
+    await removeStandings(guild.id, leagueId);
+    console.log(
+      `[Delete] Removed all message IDs for league ${leagueId} from database.`
+    );
+  } catch (error) {
+    console.error(
+      `[Delete] Failed to delete messages for league ${leagueId} in server ${guild.name}:`,
+      error.message
+    );
+  }
 }

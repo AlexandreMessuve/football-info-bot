@@ -1,8 +1,14 @@
 import { endOfWeek, format, startOfWeek } from 'date-fns';
 import LEAGUE_MAP from '../data/league.js';
 import { getServerConfig } from '../db/serverConfig.js';
+import i18next from "i18next";
 export const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
+export async function changeLang(guildId){
+  const server = await getServerConfig(guildId);
+  const lang =  server?.language || 'en';
+  await i18next.changeLanguage(lang);
+}
 /**
  * Get choices for adding or removing leagues based on server configuration
  * @param guildId

@@ -135,6 +135,7 @@ export async function getStandingsByLeague(leagueId) {
     const league =  {
         id: res.league.id,
         name: res.league.name,
+        logo: res.league.logo,
         standings: []
     };
     if (res.league.standings[0].length > 0){

@@ -1,9 +1,10 @@
 import {MessageFlags, SlashCommandBuilder} from 'discord.js';
 import LEAGUE_MAP from '../data/league.js';
 import i18next from 'i18next';
-import {getServerConfig, removeLeagueDb} from '../db/serverConfig.js';
+import {getServerConfig, removeLeagueDb, removeStandings} from '../db/serverConfig.js';
 import {deleteLeagueMessage} from '../utils/match.js';
 import {fetchDailyMatchesByLeague} from '../tasks/scheduledTasks.js';
+import {deleteStandingLeague} from "../utils/standing.js";
 
 /**
  * Remove a league from the server's configuration and delete associated messages.
@@ -41,8 +42,9 @@ export default {
                 await Promise.all([
                     deleteLeagueMessage(guild, leagueId),
                     removeLeagueDb(guild.id, leagueId),
-                    fetchDailyMatchesByLeague(),
+                    deleteStandingLeague(guild, leagueId)
                 ]);
+                await fetchDailyMatchesByLeague();
                 await interaction.editReply(
                     i18next.t('removeLeagueSuccess', {leagueName})
                 );

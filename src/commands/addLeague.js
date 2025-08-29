@@ -50,9 +50,8 @@ export default {
             await Promise.all([
                 addLeague(guild.id, leagueId, leagueName),
                 postLeagueMessage(guild, leagueId),
-                fetchDailyMatchesByLeague(),
             ]);
-            await postStandingLeague(guild, leagueId, server.channelId);
+            await fetchDailyMatchesByLeague();
             await interaction.editReply(
                 i18next.t('addLeagueSuccess', {leagueName})
             );

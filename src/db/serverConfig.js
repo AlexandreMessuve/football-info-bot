@@ -5,9 +5,10 @@ import 'dotenv/config';
  * Sets the channel for a specific guild in the database.
  * @param guildId
  * @param channelId
+ * @param language
  * @returns {Promise<*>}
  */
-export async function setServerChannel(guildId, channelId) {
+export async function setServerChannel(guildId, channelId, language) {
   try {
     const serverCollection = db.collection('servers');
     return await serverCollection.updateOne(
@@ -16,6 +17,7 @@ export async function setServerChannel(guildId, channelId) {
         $set: {
           guildId,
           channelId,
+          language
         },
       },
       { upsert: true }
@@ -64,12 +66,32 @@ export async function addStanding(guildId, leagueId, standingMessageId) {
             $addToSet: {
                 ['standings']: {
                     id: leagueId,
-                    channelId: standingMessageId
+                    messageId: standingMessageId
                 },
             },
         },
         { upsert: true }
     );
+}
+/**
+ * Adds a league to the specified guild in the database.
+ * @param guildId
+ * @param leagueId
+ * @returns {Promise<*>}
+ */
+export async function removeStandings(guildId, leagueId) {
+  const serverCollection = db.collection('servers');
+  return await serverCollection.updateOne(
+    { guildId },
+    {
+      $pull: {
+        standings: {
+          id: leagueId,
+        },
+      },
+    },
+    { upsert: true }
+  );
 }
 
 /**
