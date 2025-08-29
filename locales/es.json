@@ -1,0 +1,19 @@
+{
+  "errorMessage": "Una error ha ocurrido al ejecutar este comando.",
+  "noPermission": "No tienes permiso para ejecutar este comando.",
+  "invalidLeagueID": "El campeonato con el ID **{{leagueID}}** es inválido.",
+  "configureChannelSuccess": "El canal {{ channelName }} ha sido configurado con éxito.",
+  "addLeagueSuccess": "¡El campeonato **{{leagueName}}** ha sido añadido con éxito!",
+  "addLeagueAlreadyExists": "El campeonato **{{leagueName}}** ya está en tu lista.",
+  "removeLeagueSuccess": "¡El campeonato **{{leagueName}}** ha sido eliminado con éxito!",
+  "removeLeagueNotFound": "El campeonato **{{leagueName}}** no se ha encontrado en tu lista.",
+  "standingsTitle" : "Clasificación - {{leagueName}}",
+  "team" : "Equipo",
+  "kickOff" : "Patada inicial",
+  "live" : "En directo",
+  "finished" : "Finalizado",
+  "halfTime" : "Medio tiempo",
+  "planning" : "Programación - {{leagueName}}",
+  "rowsStanding" : "➤ Pts: **{{points}}** | PJ: **{{played}}** | V: **{{win}}** | E: **{{draw}}** | D: **{{lose}}** | GF: **{{goalsFor}}** | GC: **{{goalsAgainst}}** | Diff: **{{goalDiff}}** | Últimos 5: {{formString}}",
+  "lastUpdate" : "Última actualización"
+}

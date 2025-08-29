@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs/promises';
-import { REST, Routes} from 'discord.js';
+import { REST, Routes } from 'discord.js';
 const __filename = new URL('', import.meta.url).pathname;
 const __dirname = path.join(__filename, '..');
 
@@ -9,44 +9,52 @@ const __dirname = path.join(__filename, '..');
  * @param client
  * @returns {Promise<void>}
  */
-export default async(client) => {
-    const commands = [];
-    const foldersPath = path.join(__dirname, '../commands');
-    try {
-        const commandFiles = await fs.readdir(foldersPath);
-        for (const file of commandFiles.filter(f => f.endsWith('.js'))) {
-            const filePath = path.join(foldersPath, file);
-            const props = await import(filePath);
-            const data =  props.default.data;
-            const execute  = props.default.execute;
+export default async (client) => {
+  const commands = [];
+  const foldersPath = path.join(__dirname, '../commands');
+  try {
+    const commandFiles = await fs.readdir(foldersPath);
+    for (const file of commandFiles.filter((f) => f.endsWith('.js'))) {
+      const filePath = path.join(foldersPath, file);
+      const props = await import(filePath);
+      const data = props.default.data;
+      const execute = props.default.execute;
 
-            const command = {data, execute};
-            if (command) {
-                commands.push(data);
-                client.commands.set(data.name, { data, execute });
-            } else {
-                console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-            }
-        }
-    } catch (error) {
-        console.error(error);
-        console.error(`Error reading commands: ${error.message}`);
+      const command = { data, execute };
+      if (command) {
+        commands.push(data);
+        client.commands.set(data.name, { data, execute });
+      } else {
+        console.log(
+          `[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`
+        );
+      }
     }
+  } catch (error) {
+    console.error(error);
+    console.error(`Error reading commands: ${error.message}`);
+  }
 
-    client.once('ready', async () => {
-        const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
-        try {
-            console.log(`Started refreshing ${commands.length} application (/) commands.`);
+  client.once('ready', async () => {
+    const rest = new REST({ version: '10' }).setToken(
+      process.env.DISCORD_TOKEN
+    );
+    try {
+      console.log(
+        `Started refreshing ${commands.length} application (/) commands.`
+      );
 
-            // The put method is used to fully refresh all commands in the guild with the current set
-            const data = await rest.put(
-                Routes.applicationCommands(process.env.DISCORD_CLIENT_ID),
-                { body: commands },
-            );
+      // The put method is used to fully refresh all commands in the guild with the current set
+      const data = await rest.put(
+        Routes.applicationCommands(process.env.DISCORD_CLIENT_ID),
+        { body: commands }
+      );
 
-            console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-        } catch (error) {
-            console.error(error);
-        }
-    })
-}
+      console.log(
+        `Successfully reloaded ${data.length} application (/) commands.`
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  });
+};

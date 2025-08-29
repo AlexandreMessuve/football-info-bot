@@ -7,11 +7,11 @@ import { Events } from 'discord.js';
  * @param client
  * @returns {Promise<void>}
  */
-export default async(client)=> {
-    await client.on(Events.ClientReady, async() => {
-        await  ready(client);
-    })
-    await client.on(Events.InteractionCreate, async interaction => {
-        await interactionCreate(interaction);
-    })
-}
+export default async (client) => {
+  await client.on(Events.ClientReady, async () => {
+    await ready(client);
+  });
+  await client.on(Events.InteractionCreate, async (interaction) => {
+    await interactionCreate(interaction);
+  });
+};

@@ -28,7 +28,7 @@ jobs:
               cd football-info-bot
               git pull
             fi
-            
+
             # Rebuild and restart bot with Docker Compose
             # Env variables are passed directly in the command for security via GitHub Secrets
             DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} DISCORD_CLIENT_ID=${{ secrets.DISCORD_CLIENT_ID }} MONGO_DB_URI=${{ secrets.MONGO_DB_URI }} FOOTBALL_API_KEY=${{ secrets.FOOTBALL_API_KEY }} FOOTBALL_API_BASE_URL=${{ secrets.FOOTBALL_API_BASE_URL }} docker compose up --build -d

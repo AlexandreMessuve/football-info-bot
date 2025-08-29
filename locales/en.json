@@ -1,10 +1,19 @@
 {
-    "errorMessage": "An error occurred while executing this command.",
-    "noPermission": "You do not have permission to use this command.",
-    "invalidLeagueID": "The provided league ID **{{leagueID}}** is invalid.",
-    "configureChannelSuccess": "Channel {{channelName}} has been successfully configured for league updates.",
-    "addLeagueSuccess": "The league **{{leagueName}}** has been successfully added!",
-    "addLeagueAlreadyExists": "The league **{{leagueName}}** is already in your list.",
-    "removeLeagueSuccess": "The league **{{leagueName}}** has been successfully removed!",
-    "removeLeagueNotFound": "The league **{{leagueName}}** was not found in your list."
+  "errorMessage": "An error occurred while executing this command.",
+  "noPermission": "You do not have permission to use this command.",
+  "invalidLeagueID": "The provided league ID **{{leagueID}}** is invalid.",
+  "configureChannelSuccess": "Channel {{channelName}} has been successfully configured for league updates.",
+  "addLeagueSuccess": "The league **{{leagueName}}** has been successfully added!",
+  "addLeagueAlreadyExists": "The league **{{leagueName}}** is already in your list.",
+  "removeLeagueSuccess": "The league **{{leagueName}}** has been successfully removed!",
+  "removeLeagueNotFound": "The league **{{leagueName}}** was not found in your list.",
+  "standingsTitle" : "Standings - {{leagueName}}",
+  "team" : "Team",
+  "kickOff" : "Kick-Off",
+  "live" : "Live",
+  "finished" : "Finished",
+  "halfTime" : "Half-time",
+  "planning" : "Planning - {{leagueName}}",
+  "rowsStanding" : "➤ Pts: **{{points}}** | P: **{{played}}** | W: **{{win}}** | D: **{{draw}}** | L: **{{lose}}** | GF: **{{goalsFor}}** | GA: **{{goalsAgainst}}** | Diff: **{{goalDiff}}** | Last 5: {{formString}}",
+  "lastUpdate" : "Last update"
 }
