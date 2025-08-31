@@ -146,7 +146,7 @@ export async function getStandingsByLeague(leagueId) {
                     name: team.team.name,
                     rank: team.rank,
                     points: team.points,
-                    form: team.form.split('').map(f => f === 'W' ? ' ✅ ' : f === 'D' ? ' ➖ ' : ' ❌ ').join(' '),
+                    form: team.form,
                     played: team.all.played,
                     win: team.all.win,
                     draw: team.all.draw,
