@@ -4,7 +4,7 @@ import {
   updateAllScores,
 } from '../tasks/scheduledTasks.js';
 import * as cron from 'node-cron';
-import { getMatches } from '../data/matches.js';
+import { getMatches } from '../data/matches.ts';
 
 /**
  * Event triggered when the bot is ready

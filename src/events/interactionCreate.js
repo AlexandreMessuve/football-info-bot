@@ -1,7 +1,7 @@
 import { MessageFlags } from 'discord.js';
 import i18next from 'i18next';
-import { getChoice } from '../utils/util.js';
-import LEAGUE_MAP from '../data/league.js';
+import { getChoice } from '../utils/util.ts';
+import LEAGUE_MAP from '../data/league.ts';
 
 /**
  * Handle interaction create event

@@ -1,6 +1,6 @@
 import { MessageFlags, SlashCommandBuilder, ChannelType } from 'discord.js';
 import i18next from 'i18next';
-import { setServerChannel } from '../db/serverConfig.js';
+import { setServerChannel } from '../db/serverConfig.ts';
 
 /**
  * Configure the bot for this server

@@ -1,10 +1,10 @@
-import {getStandingsByLeague} from "../api/footballApi.js";
+import {getStandingsByLeague} from "../api/footballApi.ts";
 import {ActionRowBuilder, ButtonBuilder,ButtonStyle , Embed, EmbedBuilder} from "discord.js";
 import i18next from "i18next";
-import {changeLang, getDateRange} from "./util.js";
-import {addStanding, getServerConfig, removeMessageId, removeStandings} from "../db/serverConfig.js";
-import league from "../data/league.js";
-import LEAGUE_MAP from "../data/league.js";
+import {changeLang, getDateRange} from "./util.ts";
+import {addStanding, getServerConfig, removeMessageId, removeStandings} from "../db/serverConfig.ts";
+import league from "../data/league.ts";
+import LEAGUE_MAP from "../data/league.ts";
 
 
 function createStandingsEmbed(league, standingsTitle) {

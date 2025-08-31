@@ -1,16 +1,21 @@
 import { db } from './mongoConfig.js';
 import 'dotenv/config';
+import type {Document, UpdateResult, WithId, Collection} from "mongodb";
+import type {Server} from "../types/servers.js";
 
+function getServerCollection(): Collection<Server> {
+  return db.collection<Server>('servers');
+}
 /**
  * Sets the channel for a specific guild in the database.
  * @param guildId
  * @param channelId
  * @param language
- * @returns {Promise<*>}
+ * @returns {Promise<UpdateResult>}
  */
-export async function setServerChannel(guildId, channelId, language) {
+export async function setServerChannel(guildId: string, channelId: string, language: string): Promise<UpdateResult> {
   try {
-    const serverCollection = db.collection('servers');
+    const serverCollection = getServerCollection();
     return await serverCollection.updateOne(
       { guildId },
       {
@@ -33,10 +38,10 @@ export async function setServerChannel(guildId, channelId, language) {
  * @param guildId
  * @param leagueId
  * @param leagueName
- * @returns {Promise<*>}
+ * @returns {Promise<UpdateResult>}
  */
-export async function addLeague(guildId, leagueId, leagueName) {
-  const serverCollection = db.collection('servers');
+export async function addLeague(guildId: string, leagueId: string, leagueName: string): Promise<UpdateResult> {
+  const serverCollection = getServerCollection();
   return await serverCollection.updateOne(
     { guildId },
     {
@@ -56,10 +61,10 @@ export async function addLeague(guildId, leagueId, leagueName) {
  * @param guildId
  * @param leagueId
  * @param standingMessageId
- * @returns {Promise<*>}
+ * @returns {Promise<UpdateResult>}
  */
-export async function addStanding(guildId, leagueId, standingMessageId) {
-    const serverCollection = db.collection('servers');
+export async function addStanding(guildId: string, leagueId: string, standingMessageId: string): Promise<UpdateResult> {
+    const serverCollection = getServerCollection();
     return await serverCollection.updateOne(
         { guildId },
         {
@@ -77,11 +82,12 @@ export async function addStanding(guildId, leagueId, standingMessageId) {
  * Adds a league to the specified guild in the database.
  * @param guildId
  * @param leagueId
- * @returns {Promise<*>}
+ * @returns {Promise<UpdateResult>}
  */
-export async function removeStandings(guildId, leagueId) {
-  const serverCollection = db.collection('servers');
-  return await serverCollection.updateOne(
+export async function removeStandings(guildId: string, leagueId: string): Promise<UpdateResult> {
+  const serverCollection = getServerCollection();
+  // @ts-ignore
+    return await serverCollection.updateOne(
     { guildId },
     {
       $pull: {
@@ -98,11 +104,12 @@ export async function removeStandings(guildId, leagueId) {
  * Removes a league from the specified guild in the database.
  * @param guildId
  * @param leagueId
- * @returns {Promise<*>}
+ * @returns {Promise<UpdateResult>}
  */
-export async function removeLeagueDb(guildId, leagueId) {
-  const serverCollection = db.collection('servers');
-  return await serverCollection.updateOne(
+export async function removeLeagueDb(guildId: string, leagueId: string): Promise<UpdateResult> {
+  const serverCollection = getServerCollection();
+  // @ts-ignore
+    return await serverCollection.updateOne(
     { guildId },
     {
       $pull: {
@@ -120,13 +127,13 @@ export async function removeLeagueDb(guildId, leagueId) {
  * @param leagueId
  * @param messageId
  * @param dateRange
- * @returns {Promise<*>}
+ * @returns {Promise<UpdateResult>}
  */
-export async function setMessageId(guildId, leagueId, messageId, dateRange) {
-  const serverCollection = db.collection('servers');
+export async function setMessageId(guildId:string, leagueId:string, messageId:string, dateRange:string): Promise<UpdateResult> {
+  const serverCollection = getServerCollection();
   return await serverCollection.updateOne(
     { guildId },
-    { $addToSet: { [`messages.${dateRange}.${leagueId}`]: [messageId] } },
+    { $addToSet: { [`messages.${dateRange}.${leagueId}`]: messageId } },
     { upsert: true }
   );
 }
@@ -136,10 +143,10 @@ export async function setMessageId(guildId, leagueId, messageId, dateRange) {
  * @param guildId
  * @param leagueId
  * @param dateRange
- * @returns {Promise<*>}
+ * @returns {Promise<UpdateResult>}
  */
-export async function removeMessageId(guildId, leagueId, dateRange) {
-  const serverCollection = db.collection('servers');
+export async function removeMessageId(guildId: string, leagueId:string, dateRange:string): Promise<UpdateResult> {
+  const serverCollection = getServerCollection();
   return await serverCollection.updateOne(
     { guildId },
     { $unset: { [`messages.${dateRange}.${leagueId}`]: '' } },
@@ -149,19 +156,19 @@ export async function removeMessageId(guildId, leagueId, dateRange) {
 
 /**
  * Retrieves all server configurations from the database.
- * @returns {Promise<*>}
+ * @returns {Promise<WithId<Server>[]>}
  */
-export async function getAllServerConfig() {
-  const serverCollection = db.collection('servers');
+export async function getAllServerConfig(): Promise<WithId<Server>[]> {
+  const serverCollection = getServerCollection();
   return await serverCollection.find({}).toArray();
 }
 
 /**
  * Retrieves the server configuration for a specific guild from the database.
  * @param guildId
- * @returns {Promise<*|null>}
+ * @returns {Promise<Server|null>}
  */
-export async function getServerConfig(guildId) {
-  const serverCollection = db.collection('servers');
+export async function getServerConfig(guildId: string): Promise<Server | null> {
+  const serverCollection = getServerCollection();
   return (await serverCollection.findOne({ guildId })) || null;
 }

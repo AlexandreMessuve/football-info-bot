@@ -1,6 +1,6 @@
 import {ChannelType, MessageFlags, SlashCommandBuilder} from 'discord.js';
 import i18next from 'i18next';
-import {addLeague, getServerConfig} from '../db/serverConfig.js';
+import {addLeague, getServerConfig} from '../db/serverConfig.ts';
 import {postLeagueMessage} from '../utils/match.js';
 import {fetchDailyMatchesByLeague} from '../tasks/scheduledTasks.js';
 import {postStandingLeague} from "../utils/standing.js";

@@ -2,12 +2,12 @@ import {
   getServerConfig,
   removeMessageId,
   setMessageId,
-} from '../db/serverConfig.js';
-import {changeLang, chunkArray, getDateRange} from './util.js';
-import { getWeeklyMatchesByLeague } from '../api/footballApi.js';
+} from '../db/serverConfig.ts';
+import {changeLang, chunkArray, getDateRange} from './util.ts';
+import { getWeeklyMatchesByLeague } from '../api/footballApi.ts';
 import { EmbedBuilder } from 'discord.js';
 import { createMatchField } from './embedHelper.js';
-import LEAGUE_MAP from '../data/league.js';
+import LEAGUE_MAP from '../data/league.ts';
 import i18next from "i18next";
 import {createLeagueEmbed} from "../tasks/scheduledTasks.js";
 import {postStandingLeague} from "./standing.js";

@@ -1,10 +1,10 @@
-import { getAllServerConfig, setMessageId } from '../db/serverConfig.js';
-import { getWeeklyMatchesByLeague } from '../api/footballApi.js';
+import { getAllServerConfig, setMessageId } from '../db/serverConfig.ts';
+import { getWeeklyMatchesByLeague } from '../api/footballApi.ts';
 import { createMatchField } from '../utils/embedHelper.js';
 import { EmbedBuilder } from 'discord.js';
-import {changeLang, chunkArray, getDateRange} from '../utils/util.js';
-import LEAGUE_MAP from '../data/league.js';
-import { addMatchesLeague } from '../data/matches.js';
+import {changeLang, chunkArray, getDateRange} from '../utils/util.ts';
+import LEAGUE_MAP from '../data/league.ts';
+import { addMatchesLeague } from '../data/matches.ts';
 import i18next from "i18next";
 import {postStandingLeague} from "../utils/standing.js";
 

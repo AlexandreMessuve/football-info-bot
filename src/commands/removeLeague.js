@@ -1,7 +1,7 @@
 import {MessageFlags, SlashCommandBuilder} from 'discord.js';
-import LEAGUE_MAP from '../data/league.js';
+import LEAGUE_MAP from '../data/league.ts';
 import i18next from 'i18next';
-import {getServerConfig, removeLeagueDb, removeStandings} from '../db/serverConfig.js';
+import {getServerConfig, removeLeagueDb, removeStandings} from '../db/serverConfig.ts';
 import {deleteLeagueMessage} from '../utils/match.js';
 import {fetchDailyMatchesByLeague} from '../tasks/scheduledTasks.js';
 import {deleteStandingLeague} from "../utils/standing.js";
