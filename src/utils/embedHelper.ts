@@ -1,29 +1,34 @@
-import i18next from "i18next";
+import i18next from 'i18next';
+import type { EmbedBuilder } from 'discord.js';
+import type { Match, Event } from '../types/match.js';
 
 /**
  * Create a match field for a Discord embed.
  * @param embed
  * @param match
  */
-export function createMatchField(embed, match) {
-  const timeStampDateMatch = match.date;
-  const matchTime = `<t:${timeStampDateMatch}:F> (<t:${timeStampDateMatch}:R>)`;
-  const homeEventsString =
+export function createMatchField(
+  embed: EmbedBuilder,
+  match: Match
+): EmbedBuilder {
+  const timeStampDateMatch: number = match.date;
+  const matchTime: string = `<t:${timeStampDateMatch}:F> (<t:${timeStampDateMatch}:R>)`;
+  const homeEventsString: string =
     match.homeTeam.events
-      .map((event) => `${event.type} ${event.player} ${event.minute}'`)
-      .join('\n\n') || ''; // '\u200B' est un espace vide pour éviter un champ vide
-
-  const awayEventsString =
-    match.awayTeam.events
-      .map((event) => `${event.type} ${event.player} ${event.minute}'`)
+      .map((event: Event) => `${event.type} ${event.player} ${event.minute}'`)
       .join('\n\n') || '';
 
-  const kickOff = i18next.t('kickOff');
-  const finished = i18next.t('finished');
-  const live = i18next.t('live');
-  const halfTime = i18next.t('halfTime');
-  let statusText;
-  const statusShort = match.status.short;
+  const awayEventsString: string =
+    match.awayTeam.events
+      .map((event: Event) => `${event.type} ${event.player} ${event.minute}'`)
+      .join('\n\n') || '';
+
+  const kickOff: string = i18next.t('kickOff');
+  const finished: string = i18next.t('finished');
+  const live: string = i18next.t('live');
+  const halfTime: string = i18next.t('halfTime');
+  let statusText: string;
+  const statusShort: string = match.status.short;
   if (['1H', '2H', 'ET'].includes(statusShort)) {
     statusText = `🔴 **${live}** | ${match.status.elapsed}"`;
   } else if (['HT'].includes(statusShort)) {
@@ -34,17 +39,17 @@ export function createMatchField(embed, match) {
     statusText = `▶️ **${kickOff}**: ${matchTime}`;
   }
 
-  const scoreOrVs = ['NS', 'TBD', 'PST', 'CANC', 'ABD', 'AWD'].includes(
+  const scoreOrVs: string = ['NS', 'TBD', 'PST', 'CANC', 'ABD', 'AWD'].includes(
     statusShort
   )
     ? 'VS'
     : `${match.homeTeam.score} - ${match.awayTeam.score}`;
-  let penalty = '';
-  let homePenaltyScore = '\n\n';
-  let awayPenaltyScore = '\n\n';
-  const isDraw = !match.homeTeam.winner && !match.awayTeam.winner;
-  const homeWin = match.homeTeam.winner ? ' ✅ ' : isDraw ? '' : ' ❌ ';
-  const awayWin = match.awayTeam.winner ? ' ✅ ' : isDraw ? '' : ' ❌ ';
+  let penalty: string = '';
+  let homePenaltyScore: string = '\n\n';
+  let awayPenaltyScore: string = '\n\n';
+  const isDraw: boolean = !match.homeTeam.winner && !match.awayTeam.winner;
+  const homeWin: string = match.homeTeam.winner ? ' ✅ ' : isDraw ? '' : ' ❌ ';
+  const awayWin: string = match.awayTeam.winner ? ' ✅ ' : isDraw ? '' : ' ❌ ';
 
   if (match.status.short === 'PEN') {
     penalty = `\n\nPEN\n ${match.homeTeam.penalty} - ${match.awayTeam.penalty}`;

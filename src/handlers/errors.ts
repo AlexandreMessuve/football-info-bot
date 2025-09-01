@@ -2,7 +2,7 @@
  * Global error handler for unhandled promise rejections and uncaught exceptions.
  */
 export default () => {
-  const errorHandler = (error) => {
+  const errorHandler = (error: Error) => {
     console.error(error);
   };
 
