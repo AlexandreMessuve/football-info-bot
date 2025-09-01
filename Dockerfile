@@ -3,9 +3,9 @@ LABEL authors="zal"
 LABEL description="Bot discord for football info matches and more"
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --production
+RUN npm install
 COPY . .
-CMD ["npm", "run", "build"]
+RUN npm run build
 FROM node:alpine AS production
 WORKDIR /app
 COPY --from=build /app/node_modules ./node_modules
