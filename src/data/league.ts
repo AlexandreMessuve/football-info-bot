@@ -1,4 +1,4 @@
-﻿const LEAGUE_MAP = new Map([
+﻿const LEAGUE_MAP: Map<string, string> = new Map([
   ['39', 'Premier League 🇬🇧'],
   ['140', 'LaLiga 🇪🇸'],
   ['78', 'Bundesliga 🇩🇪'],

@@ -1,18 +1,27 @@
-import {
-  Client,
-  GatewayIntentBits,
-  MessageFlags,
-  Collection,
-} from 'discord.js';
+import { Client, GatewayIntentBits, Collection } from 'discord.js';
 import { connectDB } from './db/mongoConfig.js';
 import 'dotenv/config';
 import i18next from 'i18next';
 import FsBackend from 'i18next-fs-backend';
 import path from 'path';
-const __filename = new URL('', import.meta.url).pathname;
-const __dirname = path.join(__filename, '..');
+import type { Command } from './types/commands.js';
+
+// Extend the Client interface to include the 'commands' property
+declare module 'discord.js' {
+  interface Client {
+    commands: Collection<string, Command>;
+  }
+}
+
+const __filename: string = new URL('', import.meta.url).pathname;
+const __dirname: string = path.join(__filename, '..');
 // Initialize i18next with filesystem backend
-const localesPath = path.join(__dirname, '..', 'locales', '{{lng}}.json');
+const localesPath: string = path.join(
+  __dirname,
+  '..',
+  'locales',
+  '{{lng}}.json'
+);
 await i18next.use(FsBackend).init({
   fallbackLng: 'en',
   preload: ['en', 'fr'],
@@ -21,13 +30,12 @@ await i18next.use(FsBackend).init({
   },
 });
 // Create a new client instance
-const client = new Client({
+const client: Client = new Client({
   intents: [GatewayIntentBits.Guilds],
 });
 
-client.commands = new Collection();
-
-const handlers = ['events', 'commands', 'errors'];
+client.commands = new Collection<string, Command>();
+const handlers: string[] = ['events', 'commands', 'errors'];
 
 // Dynamically import and execute each handler
 for (const handler of handlers) {
