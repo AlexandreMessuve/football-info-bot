@@ -1,26 +1,26 @@
 export interface League {
-    id: string;
-    name: string;
+  id: string;
+  name: string;
 }
 
-export interface Standing {
-    id: string;
-    messageId: string;
+export interface Standings {
+  id: string;
+  messageId: string;
 }
 
 export interface LeagueMessages {
-    [leagueId: string]: string[];
+  [leagueId: string]: string[];
 }
 
 export interface DateMessage {
-    [dateRange: string]: LeagueMessages;
+  [dateRange: string]: LeagueMessages;
 }
 
 export interface Server {
-    guildId: string;
-    channelId: string;
-    language: string;
-    leagues?: League[];
-    standings?: Standing[];
-    messages?: DateMessage;
+  guildId: string;
+  channelId: string;
+  language: string;
+  leagues?: League[];
+  standings?: Standings[];
+  messages?: DateMessage;
 }

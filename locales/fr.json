@@ -8,12 +8,12 @@
   "removeLeagueSuccess": "Le championnat **{{leagueName}}** a été supprimé avec succès !",
   "removeLeagueNotFound": "Le championnat **{{leagueName}}** n'a pas été trouvé dans votre liste.",
   "standingsTitle": "Classements - **{{leagueName}}**",
-  "team" : "Équipe",
-  "kickOff" : "Coup d'envoi",
-  "live" : "En direct",
-  "finished" : "Terminé",
-  "halfTime" : "Mi-temps",
-  "planning" : "Programme - **{{leagueName}}**",
-  "rowsStanding" : "➤ Pts: **{{points}}** | J: **{{played}}** | V: **{{win}}** | N: **{{draw}}** | D: **{{lose}}** | BP: **{{goalsFor}}** | BC: **{{goalsAgainst}}** | Diff: **{{goalDiff}}** | Forme: {{formString}}",
-  "lastUpdate" : "Dernière mise à jour"
+  "team": "Équipe",
+  "kickOff": "Coup d'envoi",
+  "live": "En direct",
+  "finished": "Terminé",
+  "halfTime": "Mi-temps",
+  "planning": "Programme - **{{leagueName}}**",
+  "rowsStanding": "➤ Pts: **{{points}}** | J: **{{played}}** | V: **{{win}}** | N: **{{draw}}** | D: **{{lose}}** | BP: **{{goalsFor}}** | BC: **{{goalsAgainst}}** | Diff: **{{goalDiff}}** | Forme: {{formString}}",
+  "lastUpdate": "Dernière mise à jour"
 }

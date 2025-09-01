@@ -1,15 +1,23 @@
 import 'dotenv/config';
-import axios, {type AxiosInstance} from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { chunkArray, delay } from '../utils/util.js';
-import type {Match, Event, Team} from "../types/match.js";
+import type { Event, Match, Team } from '../types/match.js';
+import type { League, Standing } from '../types/standing.js';
+import type {
+  ApiEvent,
+  ApiFixture,
+  ApiLeague,
+  ApiStanding,
+} from '../types/api.js';
+
 const BASE_URL: string | undefined = process.env.FOOTBALL_API_BASE_URL;
 const API_KEY: string | undefined = process.env.FOOTBALL_API_KEY;
 
 if (!BASE_URL) {
-    throw new Error('No baseURL provided');
+  throw new Error('No baseURL provided');
 }
 if (!API_KEY) {
-    throw new Error('No API key provided');
+  throw new Error('No API key provided');
 }
 /**
  * Create axios instance for football API
@@ -28,84 +36,95 @@ const footballApi: AxiosInstance = axios.create({
  * @param to
  * @returns {Promise<Match[]>}
  */
-export async function getWeeklyMatchesByLeague(leagueId: string, from: string, to: string): Promise<Match[]> {
+export async function getWeeklyMatchesByLeague(
+  leagueId: string,
+  from: string,
+  to: string
+): Promise<Match[]> {
   try {
-    const response = await footballApi.get('/fixtures', {
-      params: {
-        league: leagueId,
-        season: new Date().getFullYear(),
-        from: from,
-        to: to,
-      },
-    });
+    const response = await footballApi.get<{ response: ApiFixture[] }>(
+      '/fixtures',
+      {
+        params: {
+          league: leagueId,
+          season: new Date().getFullYear(),
+          from: from,
+          to: to,
+        },
+      }
+    );
 
-    const allMatches: any[] = response.data.response;
+    const allMatches: ApiFixture[] = response.data.response;
 
     if (allMatches.length === 0) return [];
 
-    const matchesDetails = allMatches.filter(
-      (m: any) => m.fixture.status.elapsed !== null
+    const matchesDetails: ApiFixture[] = allMatches.filter(
+      (m: ApiFixture) => m.fixture.status.elapsed !== null
     );
-    const matchChunks: any[][] = chunkArray(matchesDetails, 5);
+    const matchChunks: ApiFixture[][] = chunkArray(matchesDetails, 5);
     const allEvents: Map<number, Event[]> = new Map();
     for (const chunk of matchChunks) {
       const eventsResults = await Promise.allSettled(
-        chunk.map((match) => getMatchEvents(match.fixture.id))
+        chunk.map((match: ApiFixture) => getMatchEvents(match.fixture.id))
       );
       eventsResults.forEach((result, index) => {
         if (result.status === 'fulfilled') {
-          const matchId: number = chunk[index].fixture.id;
-          const eventsFormated: Event[] = result.value.filter((event: any) =>
-            ['Goal', 'Card'].includes(event.type)
-          ).map((event: any) => {
+          const matchId: number | undefined = chunk[index]?.fixture.id;
+          if (!matchId) return;
+          const eventsFormated: Event[] = result.value
+            .filter((event: ApiEvent): boolean =>
+              ['Goal', 'Card'].includes(event.type)
+            )
+            .map((event: ApiEvent): Event => {
               const type: string =
-                  event.type === 'Card'
-                      ? event.detail === 'Yellow Card'
-                          ? '🟨 '
-                          : '🟥 '
-                      : event.detail === 'Missed Penalty'
-                          ? '❌'
-                          : '⚽';
-              let detail: string =
-                  event.detail === 'Penalty'
-                      ? '(PEN)'
-                      : event.detail === 'Own Goal'
-                          ? '(OG)'
-                          : '';
-              const minute: string = event.time.elapsed +
-                  (event.time.extra ? '+' + event.time.extra : '') +
-                  '\'';
-              const simpleEvent: Event = {
-                  teamId: event.team.id,
-                  minute,
-                  type: type + detail,
-                  player: event.player.name
-              }
-              return simpleEvent;
-          });
+                event.type === 'Card'
+                  ? event.detail === 'Yellow Card'
+                    ? '🟨 '
+                    : '🟥 '
+                  : event.detail === 'Missed Penalty'
+                    ? '❌'
+                    : '⚽';
+              const detail: string =
+                event.detail === 'Penalty'
+                  ? '(PEN)'
+                  : event.detail === 'Own Goal'
+                    ? '(OG)'
+                    : '';
+              const minute: string =
+                event.time.elapsed +
+                (event.time.extra ? '+' + event.time.extra : '') +
+                "'";
+
+              return {
+                teamId: event.team.id,
+                minute,
+                type: type + detail,
+                player: event.player.name,
+              };
+            });
           allEvents.set(matchId, eventsFormated);
         }
       });
       await delay(1000);
     }
 
-    return allMatches.map((match) => {
+    return allMatches.map((match: ApiFixture): Match => {
       const matchEvents: Event[] | [] = allEvents.get(match.fixture.id) || [];
 
       const homeTeam: Team = {
-          name: match.teams.home.name,
-          score: match.goals.home ?? 0,
-          penalty: match.score.penalty.home ?? 0,
-          winner: match.teams.home.winner,
-          events: [],
-      }
+        name: match.teams.home.name,
+        score: match.goals.home ?? 0,
+        penalty: match.score.penalty.home ?? 0,
+        winner: match.teams.home.winner ?? false,
+        events: [],
+      };
       const awayTeam: Team = {
-          name: match.teams.away.name,
-          score: match.goals.away ?? 0,
-          penalty: match.score.penalty.away ?? 0,
-          winner: match.teams.away.winner,
-          events: [],
-      }
+        name: match.teams.away.name,
+        score: match.goals.away ?? 0,
+        penalty: match.score.penalty.away ?? 0,
+        winner: match.teams.away.winner ?? false,
+        events: [],
+      };
 
       const formatedMatch: Match = {
         id: match.fixture.id,
@@ -115,19 +134,19 @@ export async function getWeeklyMatchesByLeague(leagueId: string, from: string, t
         homeTeam,
         awayTeam,
       };
-        if (matchEvents && matchEvents.length > 0) {
-            matchEvents.forEach((event) => {
-                if (event.teamId === match.teams.home.id) {
-                    formatedMatch.homeTeam.events.push(event);
-                } else if (event.teamId === match.teams.away.id) {
-                    formatedMatch.awayTeam.events.push(event);
-                }
-            });
-        }
+      if (matchEvents && matchEvents.length > 0) {
+        matchEvents.forEach((event) => {
+          if (event.teamId === match.teams.home.id) {
+            formatedMatch.homeTeam.events.push(event);
+          } else if (event.teamId === match.teams.away.id) {
+            formatedMatch.awayTeam.events.push(event);
+          }
+        });
+      }
       return formatedMatch;
     });
-  } catch (error: any) {
-    console.error('[ERROR] Impossible to get matches :', error.message);
+  } catch (error) {
+    console.error('[ERROR] Impossible to get matches :', error);
     return [];
   }
 }
@@ -135,65 +154,72 @@ export async function getWeeklyMatchesByLeague(leagueId: string, from: string, t
 /**
  * Get standings by league
  * @param leagueId
- * @returns {Promise<*|*[]>}
+ * @returns {Promise<League | null>}
  */
-export async function getStandingsByLeague(leagueId: string): Promise<any | any[]> {
+export async function getStandingsByLeague(
+  leagueId: string
+): Promise<League | null> {
   try {
-    const response = await footballApi.get('/standings', {
-      params: {
-        league: leagueId,
-        season: new Date().getFullYear(),
-      },
-    });
-    const res = response.data.response[0];
-    if (res.length === 0) return [];
-    const league =  {
-        id: res.league.id,
-        name: res.league.name,
-        logo: res.league.logo,
-        standings: []
+    const response = await footballApi.get<{ response: ApiLeague[] }>(
+      '/standings',
+      {
+        params: {
+          league: leagueId,
+          season: new Date().getFullYear(),
+        },
+      }
+    );
+    const leagueData = response.data.response[0]?.league;
+    if (!leagueData) return null;
+
+    const standingsData: ApiStanding[] = leagueData.standings?.[0] || [];
+    const league: League = {
+      id: leagueData.id,
+      name: leagueData.name,
+      logo: leagueData.logo,
+      standings: [],
     };
-    if (res.league.standings[0].length > 0){
-        let standings = res.league.standings[0];
-        standings = standings.map((team: any) => {
-            return {
-                team: {
-                    name: team.team.name,
-                    rank: team.rank,
-                    points: team.points,
-                    form: team.form,
-                    played: team.all.played,
-                    win: team.all.win,
-                    draw: team.all.draw,
-                    lose: team.all.lose,
-                    goalsFor: team.all.goals.for,
-                    goalsAgainst: team.all.goals.against,
-                    goalsDiff: team.goalsDiff,
-                }
-            }
-        })
-        league.standings = standings;
+    if (standingsData.length > 0) {
+      league.standings = standingsData.map((apiStanding: ApiStanding) => {
+        const standing: Standing = {
+          name: apiStanding.team.name,
+          rank: apiStanding.rank,
+          points: apiStanding.points,
+          form: apiStanding.form,
+          played: apiStanding.all.played,
+          win: apiStanding.all.win,
+          draw: apiStanding.all.draw,
+          lose: apiStanding.all.lose,
+          goalsFor: apiStanding.all.goals.for,
+          goalsAgainst: apiStanding.all.goals.against,
+          goalsDiff: apiStanding.goalsDiff,
+        };
+        return standing;
+      });
     }
     return league;
-  } catch (error: any) {
+  } catch (error) {
     console.error('[ERROR] Impossible to get standings', error);
-    return [];
+    return null;
   }
 }
 
 /**
  * Get match events by match id
  * @param matchId
- * @returns {Promise<*|*[]>}
+ * @returns {Promise<ApiEvent[]>}
  */
-export async function getMatchEvents(matchId: number): Promise<any | any[]> {
+export async function getMatchEvents(matchId: number): Promise<ApiEvent[]> {
   try {
-    const response = await footballApi.get('/fixtures/events', {
-      params: {
-        fixture: matchId,
-      },
-    });
-    return response.data.response;
+    const response = await footballApi.get<{ response: ApiEvent[] }>(
+      '/fixtures/events',
+      {
+        params: {
+          fixture: matchId,
+        },
+      }
+    );
+    return response.data.response || [];
   } catch (error) {
     console.error('[ERROR] Impossible to get match detail', error);
     return [];

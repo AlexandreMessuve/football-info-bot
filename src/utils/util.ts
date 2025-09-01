@@ -1,7 +1,7 @@
 import { endOfWeek, format, startOfWeek } from 'date-fns';
-import LEAGUE_MAP from '../data/league.ts';
-import { getServerConfig } from '../db/serverConfig.ts';
-import i18next from "i18next";
+import LEAGUE_MAP from '../data/league.js';
+import { getServerConfig } from '../db/serverConfig.js';
+import i18next from 'i18next';
 
 interface Choice {
   name: string;
@@ -13,13 +13,13 @@ interface DateRange {
   dateTo: string;
 }
 
-
 /**
  * Create a delay
  * @param ms - Milliseconds to wait
  * @returns A promise that resolves after the specified delay
  */
-export const delay = (ms: number): Promise<void> => new Promise((res) => setTimeout(res, ms));
+export const delay = (ms: number): Promise<void> =>
+  new Promise((res) => setTimeout(res, ms));
 
 /**
  * Change the language for i18next based on the server configuration.
@@ -37,7 +37,10 @@ export async function changeLang(guildId: string): Promise<void> {
  * @param type - Type of operation: 'add' to get leagues that can be added, 'remove' to get leagues that can be removed.
  * @returns Array of choices with league names and IDs.
  */
-export async function getChoice(guildId: string, type: 'add' | 'remove'): Promise<Choice[]> {
+export async function getChoice(
+  guildId: string,
+  type: 'add' | 'remove'
+): Promise<Choice[]> {
   const server = await getServerConfig(guildId);
   if (!server) return [];
 
@@ -45,7 +48,7 @@ export async function getChoice(guildId: string, type: 'add' | 'remove'): Promis
   if (type === 'remove' && configuredLeagues.size === 0) return [];
 
   const allLeagues: [string, string][] = Array.from(LEAGUE_MAP.entries());
-  let filteredLeagues: [string, string][] = [];
+  let filteredLeagues: [string, string][];
 
   if (type === 'add') {
     filteredLeagues = allLeagues.filter(([id]) => !configuredLeagues.has(id));

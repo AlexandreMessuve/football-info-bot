@@ -7,13 +7,13 @@
   "addLeagueAlreadyExists": "The league **{{leagueName}}** is already in your list.",
   "removeLeagueSuccess": "The league **{{leagueName}}** has been successfully removed!",
   "removeLeagueNotFound": "The league **{{leagueName}}** was not found in your list.",
-  "standingsTitle" : "Standings - {{leagueName}}",
-  "team" : "Team",
-  "kickOff" : "Kick-Off",
-  "live" : "Live",
-  "finished" : "Finished",
-  "halfTime" : "Half-time",
-  "planning" : "Planning - {{leagueName}}",
-  "rowsStanding" : "➤ Pts: **{{points}}** | P: **{{played}}** | W: **{{win}}** | D: **{{draw}}** | L: **{{lose}}** | GF: **{{goalsFor}}** | GA: **{{goalsAgainst}}** | Diff: **{{goalDiff}}** | Last 5: {{formString}}",
-  "lastUpdate" : "Last update"
+  "standingsTitle": "Standings - {{leagueName}}",
+  "team": "Team",
+  "kickOff": "Kick-Off",
+  "live": "Live",
+  "finished": "Finished",
+  "halfTime": "Half-time",
+  "planning": "Planning - {{leagueName}}",
+  "rowsStanding": "➤ Pts: **{{points}}** | P: **{{played}}** | W: **{{win}}** | D: **{{draw}}** | L: **{{lose}}** | GF: **{{goalsFor}}** | GA: **{{goalsAgainst}}** | Diff: **{{goalDiff}}** | Last 5: {{formString}}",
+  "lastUpdate": "Last update"
 }

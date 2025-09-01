@@ -1,7 +1,7 @@
 import { db } from './mongoConfig.js';
 import 'dotenv/config';
-import type {Document, UpdateResult, WithId, Collection} from "mongodb";
-import type {Server} from "../types/servers.js";
+import type { UpdateResult, WithId, Collection } from 'mongodb';
+import type { Server } from '../types/servers.js';
 
 function getServerCollection(): Collection<Server> {
   return db.collection<Server>('servers');
@@ -13,7 +13,11 @@ function getServerCollection(): Collection<Server> {
  * @param language
  * @returns {Promise<UpdateResult>}
  */
-export async function setServerChannel(guildId: string, channelId: string, language: string): Promise<UpdateResult> {
+export async function setServerChannel(
+  guildId: string,
+  channelId: string,
+  language: string
+): Promise<UpdateResult> {
   try {
     const serverCollection = getServerCollection();
     return await serverCollection.updateOne(
@@ -22,7 +26,7 @@ export async function setServerChannel(guildId: string, channelId: string, langu
         $set: {
           guildId,
           channelId,
-          language
+          language,
         },
       },
       { upsert: true }
@@ -40,7 +44,11 @@ export async function setServerChannel(guildId: string, channelId: string, langu
  * @param leagueName
  * @returns {Promise<UpdateResult>}
  */
-export async function addLeague(guildId: string, leagueId: string, leagueName: string): Promise<UpdateResult> {
+export async function addLeague(
+  guildId: string,
+  leagueId: string,
+  leagueName: string
+): Promise<UpdateResult> {
   const serverCollection = getServerCollection();
   return await serverCollection.updateOne(
     { guildId },
@@ -48,7 +56,7 @@ export async function addLeague(guildId: string, leagueId: string, leagueName: s
       $addToSet: {
         ['leagues']: {
           id: leagueId,
-          name: leagueName
+          name: leagueName,
         },
       },
     },
@@ -63,20 +71,24 @@ export async function addLeague(guildId: string, leagueId: string, leagueName: s
  * @param standingMessageId
  * @returns {Promise<UpdateResult>}
  */
-export async function addStanding(guildId: string, leagueId: string, standingMessageId: string): Promise<UpdateResult> {
-    const serverCollection = getServerCollection();
-    return await serverCollection.updateOne(
-        { guildId },
-        {
-            $addToSet: {
-                ['standings']: {
-                    id: leagueId,
-                    messageId: standingMessageId
-                },
-            },
+export async function addStanding(
+  guildId: string,
+  leagueId: string,
+  standingMessageId: string
+): Promise<UpdateResult> {
+  const serverCollection = getServerCollection();
+  return await serverCollection.updateOne(
+    { guildId },
+    {
+      $addToSet: {
+        ['standings']: {
+          id: leagueId,
+          messageId: standingMessageId,
         },
-        { upsert: true }
-    );
+      },
+    },
+    { upsert: true }
+  );
 }
 /**
  * Adds a league to the specified guild in the database.
@@ -84,10 +96,12 @@ export async function addStanding(guildId: string, leagueId: string, standingMes
  * @param leagueId
  * @returns {Promise<UpdateResult>}
  */
-export async function removeStandings(guildId: string, leagueId: string): Promise<UpdateResult> {
+export async function removeStandings(
+  guildId: string,
+  leagueId: string
+): Promise<UpdateResult> {
   const serverCollection = getServerCollection();
-  // @ts-ignore
-    return await serverCollection.updateOne(
+  return await serverCollection.updateOne(
     { guildId },
     {
       $pull: {
@@ -106,10 +120,12 @@ export async function removeStandings(guildId: string, leagueId: string): Promis
  * @param leagueId
  * @returns {Promise<UpdateResult>}
  */
-export async function removeLeagueDb(guildId: string, leagueId: string): Promise<UpdateResult> {
+export async function removeLeagueDb(
+  guildId: string,
+  leagueId: string
+): Promise<UpdateResult> {
   const serverCollection = getServerCollection();
-  // @ts-ignore
-    return await serverCollection.updateOne(
+  return await serverCollection.updateOne(
     { guildId },
     {
       $pull: {
@@ -129,7 +145,12 @@ export async function removeLeagueDb(guildId: string, leagueId: string): Promise
  * @param dateRange
  * @returns {Promise<UpdateResult>}
  */
-export async function setMessageId(guildId:string, leagueId:string, messageId:string, dateRange:string): Promise<UpdateResult> {
+export async function setMessageId(
+  guildId: string,
+  leagueId: string,
+  messageId: string,
+  dateRange: string
+): Promise<UpdateResult> {
   const serverCollection = getServerCollection();
   return await serverCollection.updateOne(
     { guildId },
@@ -145,7 +166,11 @@ export async function setMessageId(guildId:string, leagueId:string, messageId:st
  * @param dateRange
  * @returns {Promise<UpdateResult>}
  */
-export async function removeMessageId(guildId: string, leagueId:string, dateRange:string): Promise<UpdateResult> {
+export async function removeMessageId(
+  guildId: string,
+  leagueId: string,
+  dateRange: string
+): Promise<UpdateResult> {
   const serverCollection = getServerCollection();
   return await serverCollection.updateOne(
     { guildId },

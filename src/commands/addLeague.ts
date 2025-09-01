@@ -1,0 +1,69 @@
+import {
+  type ChatInputCommandInteraction,
+  type Guild,
+  SlashCommandBuilder,
+} from 'discord.js';
+import i18next from 'i18next';
+import { addLeague, getServerConfig } from '../db/serverConfig.js';
+import { postLeagueMessage } from '../utils/match.js';
+import { fetchDailyMatchesByLeague } from '../tasks/scheduledTasks.js';
+import type { Server } from '../types/servers.js';
+
+/**
+ * Command to add a new league to the system.
+ * This command allows users to add a league by specifying its name.
+ * It checks if the league already exists in the server configuration before adding it.
+ * Upon successful addition, it posts a message about the league and fetches daily matches.
+ */
+export default {
+  data: new SlashCommandBuilder()
+    .setName('add-league')
+    .setDescription('Add a new league to the system')
+    .setDescriptionLocalizations({
+      fr: 'Ajouter un nouveau championnat à surveiller',
+      'es-ES': 'Agregar una nueva liga al sistema',
+    })
+    .addStringOption((option) =>
+      option
+        .setName('league')
+        .setDescription(
+          'The name of the league to add (e.g., Premier League, La Liga)'
+        )
+        .setDescriptionLocalizations({
+          fr: 'Le nom du championnat à ajouter (ex : Premier League, La Liga)',
+          'es-ES':
+            'El nombre de la liga a agregar (por ejemplo, Premier League, La Liga)',
+        })
+        .setRequired(true)
+        .setAutocomplete(true)
+    ),
+  async execute(
+    leagueId: string,
+    leagueName: string,
+    guild: Guild,
+    interaction: ChatInputCommandInteraction
+  ) {
+    const server: Server | null = await getServerConfig(guild.id);
+    if (server && server.leagues?.some((l) => l.id === leagueId)) {
+      await interaction.editReply({
+        content: i18next.t('addLeagueAlreadyExists', { leagueName }),
+      });
+      return;
+    }
+    try {
+      await Promise.all([
+        addLeague(guild.id, leagueId, leagueName),
+        postLeagueMessage(guild, leagueId),
+      ]);
+      await fetchDailyMatchesByLeague();
+      await interaction.editReply(
+        i18next.t('addLeagueSuccess', { leagueName })
+      );
+    } catch (e) {
+      await interaction.editReply({
+        content: i18next.t('errorMessage'),
+      });
+      console.error('[ERROR] addLeague command failed:', e);
+    }
+  },
+};
